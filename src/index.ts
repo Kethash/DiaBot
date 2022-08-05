@@ -7,6 +7,8 @@ import { DiaBot } from './structures/DiaBot';
 const client = new DiaBot({intents: [GatewayIntentBits.Guilds, 
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildPresences,
+    GatewayIntentBits.GuildMembers
 ]});
 client.start();
 
