@@ -15,11 +15,11 @@ const leaveMessages = {
 
 export = {
     name: 'guildMemberRemove',
-    execute(member: GuildMember) {
+    async execute(redisClient: any, member: GuildMember) {
         const channel = member.guild.channels.cache.get('1004158219570127011') as TextChannel;
         const minutesElapsed: number = member.joinedAt ? getMinDiff(member.joinedAt, new Date()): 99;
-
-        if (minutesElapsed > 10) return;
+        const loveleavetime: number = await redisClient.get('loveleavetime');
+        if (minutesElapsed > loveleavetime) return;
 
         const goodbyembed = new EmbedBuilder()
         .setTitle(leaveMessages.title)

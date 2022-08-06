@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  diatabase:
+    container_name: 'diatabase'
+    image: 'redis'
+  diabot:
+    container_name: 'diabot'
+    image: 'diabot'
+    build: .
+    ports:
+      - '3000:3000'
+

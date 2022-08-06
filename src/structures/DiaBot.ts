@@ -1,11 +1,40 @@
-import { Client, Collection } from 'discord.js';
+import { Client, Collection, GuildMember } from 'discord.js';
 import fs from 'fs';
 import path from 'node:path';
 
+// Connect to redis
+import {createClient} from 'redis';
+
 class DiaBot extends Client {
+    private diatabaseUnits = {
+        'events': ['loveleave'],
+        'commands': ['setloveleavetime']
+    }
+
     commands = new Collection()
 
+    async connectToRedis() {
+        // Default port: 6379
+        const redisClient = createClient({
+            socket: {
+                host: 'diatabase',
+                port: 6379
+            }
+        });
+        await redisClient.connect();
+        redisClient.on('connect', function() {
+            console.log('Diatabase connected!');
+        });
+
+        redisClient.set('loveleavetime', 5); // default loveleave time (5 minutes)
+
+        return redisClient;
+    }
+
     async start(): Promise<void> {
+        
+        const redisClient = await this.connectToRedis();
+
         const commandsPath = path.join(__dirname, '../commands');
         const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
@@ -26,6 +55,8 @@ class DiaBot extends Client {
             const event = require(filePath);
             if (event.once) {
                 this.once(event.name, (...args) => event.execute(...args));
+            } else if (this.diatabaseUnits["events"].includes(file.replace('.js',''))) {
+                this.on(event.name, (...args) => event.execute(redisClient, ...args));
             } else {
                 this.on(event.name, (...args) => event.execute(...args));
             }
@@ -38,7 +69,8 @@ class DiaBot extends Client {
             if (!command) return;
         
             try {
-                await command.execute(interaction);
+                if (this.diatabaseUnits["commands"].includes(interaction.commandName)) await command.execute(interaction, redisClient);
+                else await command.execute(interaction);
             } catch (error) {
                 console.error(error);
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
