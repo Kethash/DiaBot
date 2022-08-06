@@ -8,7 +8,7 @@ import {createClient} from 'redis';
 class DiaBot extends Client {
     private diatabaseUnits = {
         'events': ['loveleave'],
-        'commands': ['setloveleavetime']
+        'commands': ['setloveleavetime','setloveleavechannel']
     }
 
     commands = new Collection()
@@ -27,6 +27,7 @@ class DiaBot extends Client {
         });
 
         redisClient.set('loveleavetime', 5); // default loveleave time (5 minutes)
+        redisClient.set('loveleavechannel', '807908826840825856') // default channel #general
 
         return redisClient;
     }

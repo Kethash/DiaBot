@@ -11,12 +11,8 @@ export = {
 
     async execute(interaction: any, redisClient: any) {
         const newTime: number = interaction.options.get('time').value;
-        await redisClient.set('loveleavetime', newTime, function(err: any, reply: any) {
-            console.log(reply);
-        });
+        await redisClient.set('loveleavetime', newTime);
 
-        const replyResult = await redisClient.get('loveleavetime');
-
-        await interaction.reply({content: `Loveleavetime set on: ${replyResult} minutes`, ephemeral: true});
+        await interaction.reply({content: `Loveleavetime set on: ${newTime} minutes`, ephemeral: true});
     }
 }
