@@ -1,4 +1,4 @@
-import { Client, Collection, GuildMember } from 'discord.js';
+import { Client, Collection, Guild, GuildMember } from 'discord.js';
 import fs from 'fs';
 import path from 'node:path';
 
@@ -25,9 +25,6 @@ class DiaBot extends Client {
         redisClient.on('connect', function() {
             console.log('Diatabase connected!');
         });
-
-        redisClient.set('loveleavetime', 5); // default loveleave time (5 minutes)
-        redisClient.set('loveleavechannel', '807908826840825856') // default channel #general
 
         return redisClient;
     }

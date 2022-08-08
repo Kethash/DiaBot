@@ -16,7 +16,7 @@ export = {
             return;
         }
 
-        await redisClient.set('loveleavechannel', newChannel);
+        await redisClient.set(`${interaction.guild.id.toString()}:loveleavechannel`, newChannel);
         const newChannelName: string = interaction.guild.channels.cache.get(newChannel).toString();
 
         await interaction.reply({content: `Loveleavechannel set on: ${newChannelName}`, ephemeral: true});

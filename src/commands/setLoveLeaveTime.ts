@@ -11,7 +11,14 @@ export = {
 
     async execute(interaction: any, redisClient: any) {
         const newTime: number = interaction.options.get('time').value;
-        await redisClient.set('loveleavetime', newTime);
+        await redisClient.set(`${interaction.guild.id.toString()}:loveleavetime`, newTime);
+
+        if (!(await redisClient.EXISTS(`${interaction.guild.id.toString()}:loveleavechannel`))) {
+            await interaction.reply({content: `Loveleavetime set on: ${newTime} minutes\n
+            Be careful you didn't set any channel to display loveleavers 
+            please use /setloveleavechannel <channelId> to define one`, ephemeral: true});
+            return;
+        }
 
         await interaction.reply({content: `Loveleavetime set on: ${newTime} minutes`, ephemeral: true});
     }
