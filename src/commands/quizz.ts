@@ -30,7 +30,7 @@ export = {
 
         const item = {
             "question": interaction.options.get('question').value,
-            "answers": interaction.options.get('answers').value.split(";"),
+            "answers": interaction.options.get('answers').value.split(";").map((answer: string) => answer.toLowerCase()),
         };
         const filter = (response: Message) => {
             return item.answers.some((answer: string) => answer.toLowerCase() === response.content.toLowerCase());
