@@ -4,6 +4,8 @@ services:
   diatabase:
     container_name: 'diatabase'
     image: 'redis'
+    volumes:
+      - ../redis-data/diatabase:/data
   diabot:
     container_name: 'diabot'
     image: 'diabot'
