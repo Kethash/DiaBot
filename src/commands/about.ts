@@ -11,7 +11,6 @@ export = {
         const exampleEmbed = new EmbedBuilder()
             .setColor('#FD5E53')
             .setTitle('About me')
-            .setURL('https://discord.js.org/')
             .setAuthor({ name: 'Dia Kurosawa'})
             .setDescription("I'm Dia Kurosawa !\nI'm here to bring order in your server and bust LoveLeavers !")
             .setThumbnail('https://pbs.twimg.com/profile_images/1471849547659988992/KdQh_Th2_400x400.jpg')

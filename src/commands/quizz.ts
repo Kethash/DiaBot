@@ -1,20 +1,22 @@
-import { Message, SlashCommandBuilder } from 'discord.js';
+import { Embed, EmbedBuilder, Message, SlashCommandBuilder } from 'discord.js';
+import getPairs from '../functions/arrays';
+
 
 export = {
     data: new SlashCommandBuilder()
             .setName('quizz')
             .setDescription('Start a quiz !')
+            .addIntegerOption(option =>
+                option.setName('options')
+                    .setDescription('Start or Stop a quizz')
+                    .setRequired(true)
+                    .addChoices(
+                        { name: 'start', value: 1 },
+                        { name: 'stop', value: 0 },
+                    ))
             .addStringOption(option => 
-                option.setName('question')
-                    .setDescription('(To be or not to be) that is the question !')
-                    .setRequired(true)
-            ).addStringOption(option =>
-                option.setName('answers')
-                    .setDescription('The answers, if multiple separate then with ";"')
-                    .setRequired(true)
-            ).addIntegerOption(option =>
-                option.setName('time')
-                    .setDescription('Set the time (in milliseconds)')
+                option.setName('name')
+                    .setDescription('Set the name of the quizz')
             ),
             
             //NOT IMPLEMENTED YET
@@ -22,29 +24,41 @@ export = {
             //     option.setName('max')
             //         .setDescription('Set the max accepted answers')
             // ),
-    async execute(interaction: any) {
-        
+    async execute(interaction: any, redisClient: any) {
+        const name:string = interaction.options.get('name') ? interaction.options.get('name').value : "This is a quizz";
 
-        const max_answers = interaction.options.get('max') ? interaction.options.get('max').value : 1;
-        const timeAnswer = interaction.options.get('time') ? interaction.options.get('time').value : 60000;
+        const optionChoice: number = interaction.options.get('options').value;
 
-        const item = {
-            "question": interaction.options.get('question').value,
-            "answers": interaction.options.get('answers').value.split(";").map((answer: string) => answer.toLowerCase()),
-        };
-        const filter = (response: Message) => {
-            return item.answers.some((answer: string) => answer.toLowerCase() === response.content.toLowerCase());
-        };
-
-        interaction.reply({ content: `**Question:** ${item.question}\nYou have ${timeAnswer/1000} seconds to answer !`, fetchReply: true })
-            .then(() => {
-                interaction.channel.awaitMessages({ filter, max: max_answers, time: timeAnswer, errors: ['time'] })
-                    .then((collected: any) => {
-                        interaction.followUp(`${collected.first().author} got the correct answer! ❤`);
-                    })
-                    .catch((collected: any) => {
-                        interaction.followUp('BUU BUU DESUWAAA !! Looks like nobody got the answer this time.');
-                    });
+        if(optionChoice === 1) {
+            const embed: EmbedBuilder = new EmbedBuilder()
+                .setColor('#FD5E53')
+                .setTitle('QUIZZ TIME !')
+                .setAuthor({ name: 'Dia Kurosawa'})
+                .setDescription(`Theme: ${name}`);
+            const key: string = `${interaction.guild.id.toString()}:quizz`;
+            await redisClient.HSET(key, "name", name);
+            await interaction.reply({embeds: [embed]});
+        } else {
+            const templeaderboard = await redisClient.sendCommand(["ZRANGE",`${interaction.guild.id.toString()}:quizz:leaderboard`,"0","10","WITHSCORES","REV"]);
+            const leaderboard = getPairs(templeaderboard).map((e: any[]) => {
+                return {
+                    "name": e[1],
+                    "value": e[0]
+                }
             });
+
+            const embed: EmbedBuilder = new EmbedBuilder()
+                .setColor('#FD5E53')
+                .setTitle('QUIZZ IS OVER !')
+                .setAuthor({ name: 'Dia Kurosawa'})
+                .setDescription(`Here is the leaderboard`)
+                .setFields(leaderboard);
+            await interaction.reply({embeds: [embed]});
+
+            await redisClient.multi()
+            .DEL(`${interaction.guild.id.toString()}:quizz`)
+            .DEL(`${interaction.guild.id.toString()}:quizz:leaderboard`)
+            .exec();
+        }
     }
 }

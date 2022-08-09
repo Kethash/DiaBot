@@ -1,4 +1,4 @@
-import { Client, Collection, Guild, GuildMember } from 'discord.js';
+import { Client, Collection } from 'discord.js';
 import fs from 'fs';
 import path from 'node:path';
 
@@ -8,7 +8,7 @@ import {createClient} from 'redis';
 class DiaBot extends Client {
     private diatabaseUnits = {
         'events': ['loveleave'],
-        'commands': ['setloveleavetime','setloveleavechannel']
+        'commands': ['setloveleavetime','setloveleavechannel','quizz', 'qa']
     }
 
     commands = new Collection()
@@ -25,7 +25,7 @@ class DiaBot extends Client {
         redisClient.on('connect', function() {
             console.log('Diatabase connected!');
         });
-
+        
         return redisClient;
     }
 
