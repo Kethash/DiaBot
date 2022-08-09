@@ -1,4 +1,4 @@
-import { channelLink, GuildChannel, SlashCommandBuilder } from "discord.js";
+import { GuildChannel, SlashCommandBuilder } from "discord.js";
 
 export = {
     data: new SlashCommandBuilder()

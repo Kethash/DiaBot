@@ -1,6 +1,7 @@
-import { Message } from "discord.js"
+import { EmbedBuilder, Message } from "discord.js"
 
-const bannedNitroWords = ["https://", "nitro"]
+const prefixLinks = ["https://","http://"]
+const bannedNitroWords = ["nitro","discord","discrod","gift","giveaway"]
 
 export = {
     name: 'messageCreate',
@@ -8,8 +9,17 @@ export = {
         if (message.author.bot) return;
         
         const content = message.content.toLowerCase();
-        if (bannedNitroWords.every(el => content.includes(el))) {
-            message.reply("BUU BUU DESUWA !");
+        if (prefixLinks.some(el => content.includes(el)) && bannedNitroWords.some(el => content.includes(el))) {
+            const embed: EmbedBuilder = new EmbedBuilder()
+                .setTitle("BUU BUU SUSPICIOUS LINK DESUWAA !!!!")
+                .setDescription(`${message.author.toString()}: ${message.content.toString()}`)
+                .addFields(
+                    {
+                        name: 'Message link',
+                        value: `${message.url.toString()}`
+                    }
+                );
+            message.reply({embeds: [embed]});
         }
 
     }

@@ -1,4 +1,4 @@
-import { Embed, EmbedBuilder, Message, SlashCommandBuilder } from 'discord.js';
+import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import getPairs from '../functions/arrays';
 
 
