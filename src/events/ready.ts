@@ -20,7 +20,6 @@ export = {
 		redisClient.set('584018480853155842:loveleavechannel', '807908826840825856') // default channel # in lovelivefr
 		
 		const Guilds: string[] = client.guilds.cache.map( (guild: Guild) => guild.id);
-		console.log(Guilds);
 		for (const id of Guilds) {
 			redisClient.set(`${id}:loveleavetime`, 5); // default loveleave time (5 minutes)
 		}
