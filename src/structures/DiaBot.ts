@@ -1,9 +1,8 @@
 import { Client, Collection } from 'discord.js';
 import fs from 'fs';
+import connectToRedis from '../functions/connect-to-redis';
 import path from 'node:path';
 
-// Connect to redis
-import {createClient} from 'redis';
 
 class DiaBot extends Client {
     private diatabaseUnits = {
@@ -13,25 +12,9 @@ class DiaBot extends Client {
 
     commands = new Collection()
 
-    async connectToRedis() {
-        // Default port: 6379
-        const redisClient = createClient({
-            socket: {
-                host: 'diatabase',
-                port: 6379
-            }
-        });
-        await redisClient.connect();
-        redisClient.on('connect', function() {
-            console.log('Diatabase connected!');
-        });
-        
-        return redisClient;
-    }
-
     async start(): Promise<void> {
         
-        const redisClient = await this.connectToRedis();
+        const [redisClient, redis_om] = await connectToRedis();
 
         const commandsPath = path.join(__dirname, '../commands');
         const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));

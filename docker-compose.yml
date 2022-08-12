@@ -3,7 +3,7 @@ version: '3'
 services:
   diatabase:
     container_name: 'diatabase'
-    image: 'redis'
+    image: 'redis/redis-stack:latest'
     volumes:
       - ../redis-data/diatabase:/data
   diabot:
