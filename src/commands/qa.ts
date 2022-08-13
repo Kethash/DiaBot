@@ -1,4 +1,4 @@
-import { Message, SlashCommandBuilder } from 'discord.js';
+import { AttachmentBuilder, EmbedBuilder, Message, SlashCommandBuilder } from 'discord.js';
 
 export = {
     data: new SlashCommandBuilder()
@@ -15,6 +15,12 @@ export = {
             ).addIntegerOption(option =>
                 option.setName('time')
                     .setDescription('Set the time (in milliseconds)')
+            ).addAttachmentOption(option =>
+                option.setName("attachment")
+                    .setDescription("Attach an image, a picture or a recording")
+            ).addStringOption(option =>
+                option.setName("imageurl")
+                    .setDescription("If you want to add an image by its URL")
             ),
             
             //NOT IMPLEMENTED YET
@@ -27,6 +33,8 @@ export = {
         const max_answers = interaction.options.get('max') ? interaction.options.get('max').value : 1;
         const timeAnswer = interaction.options.get('time') ? interaction.options.get('time').value : 60000;
 
+        const [attachments, attachmentsUrl] = [interaction.options.get('attachment'), interaction.options.get('imageurl')];
+
         const item = {
             "question": interaction.options.get('question').value,
             "answers": interaction.options.get('answers').value.split(";").map((answer: string) => answer.toLowerCase()),
@@ -35,8 +43,15 @@ export = {
             return item.answers.some((answer: string) => answer.toLowerCase() === response.content.toLowerCase());
         };
 
+        const embed: EmbedBuilder = new EmbedBuilder()
+            .setColor('#FD5E53')
+            .setTitle(`**Question:** ${item.question}\nYou have ${timeAnswer/1000} seconds to answer !`)
+            .setImage(attachmentsUrl ? attachmentsUrl.value: null)
+
+        const qAttachment: AttachmentBuilder | null = attachments ? new AttachmentBuilder(attachments.attachment.attachment) : null;
+
         if (await redisClient.exists(`${interaction.guild.id.toString()}:quizz`)) {
-            interaction.reply({ content: `**Question:** ${item.question}\nYou have ${timeAnswer/1000} seconds to answer !`, fetchReply: true })
+            interaction.reply({ embeds: [embed], files: [qAttachment], fetchReply: true })
             .then(() => {
                 interaction.channel.awaitMessages({ filter, max: max_answers, time: timeAnswer, errors: ['time'] })
                     .then((collected: any) => {
@@ -48,7 +63,7 @@ export = {
                     });
             });
         } else {
-            interaction.reply({ content: `**Question:** ${item.question}\nYou have ${timeAnswer/1000} seconds to answer !`, fetchReply: true })
+            interaction.reply({ embeds: [embed],files: [qAttachment], fetchReply: true })
             .then(() => {
                 interaction.channel.awaitMessages({ filter, max: max_answers, time: timeAnswer, errors: ['time'] })
                     .then((collected: any) => {
