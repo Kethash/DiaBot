@@ -48,10 +48,10 @@ export = {
             .setTitle(`**Question:** ${item.question}\nYou have ${timeAnswer/1000} seconds to answer !`)
             .setImage(attachmentsUrl ? attachmentsUrl.value: null)
 
-        const qAttachment: AttachmentBuilder | null = attachments ? new AttachmentBuilder(attachments.attachment.attachment) : null;
+        const qAttachment: Array<AttachmentBuilder> | null = attachments ? [new AttachmentBuilder(attachments.attachment.attachment)] : null;
 
         if (await redisClient.exists(`${interaction.guild.id.toString()}:quizz`)) {
-            interaction.reply({ embeds: [embed], files: [qAttachment], fetchReply: true })
+            interaction.reply({ embeds: [embed], files: qAttachment, fetchReply: true })
             .then(() => {
                 interaction.channel.awaitMessages({ filter, max: max_answers, time: timeAnswer, errors: ['time'] })
                     .then((collected: any) => {
@@ -63,7 +63,7 @@ export = {
                     });
             });
         } else {
-            interaction.reply({ embeds: [embed],files: [qAttachment], fetchReply: true })
+            interaction.reply({ embeds: [embed],files: qAttachment, fetchReply: true })
             .then(() => {
                 interaction.channel.awaitMessages({ filter, max: max_answers, time: timeAnswer, errors: ['time'] })
                     .then((collected: any) => {
