@@ -2,7 +2,7 @@ import { EmbedBuilder, Message } from "discord.js"
 
 const prefixLinks = ["https://","http://"]
 const bannedNitroWords = ["nitro","discord","discrod","gift","giveaway"]
-const whiteList = ["https://media.discordapp.net/attachments"]
+const whiteList = ["https://media.discordapp.net/attachments","https://discord.com"]
 
 export = {
     name: 'messageCreate',
