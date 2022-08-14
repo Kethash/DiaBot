@@ -2,6 +2,7 @@ import { EmbedBuilder, Message } from "discord.js"
 
 const prefixLinks = ["https://","http://"]
 const bannedNitroWords = ["nitro","discord","discrod","gift","giveaway"]
+const whiteList = ["https://media.discordapp.net/attachments"]
 
 export = {
     name: 'messageCreate',
@@ -9,9 +10,11 @@ export = {
         if (message.author.bot) return;
         
         const content = message.content.toLowerCase();
-        if (prefixLinks.some(el => content.includes(el)) && bannedNitroWords.some(el => content.includes(el))) {
+        if (whiteList.some(el => content.includes(el))) { return; }
+        else if (prefixLinks.some(el => content.includes(el)) && bannedNitroWords.some(el => content.includes(el))) {
             const embed: EmbedBuilder = new EmbedBuilder()
                 .setTitle("BUU BUU SUSPICIOUS LINK DESUWAA !!!!")
+                .setColor('#FD5E53')
                 .setDescription(`${message.author.toString()}: ${message.content.toString()}`)
                 .addFields(
                     {

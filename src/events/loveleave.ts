@@ -26,7 +26,7 @@ export = {
         .setTitle(leaveMessages.title)
         .setAuthor({name: `${member.user.tag}`, iconURL: `${member.user.avatarURL()}`})
         .setDescription(leaveMessages.description)
-        .setColor("#FF0000");
+        .setColor("#FD5E53");
         channel.send({embeds: [goodbyembed]});
     }
 }
