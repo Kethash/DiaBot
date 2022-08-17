@@ -2,7 +2,7 @@
 import {createClient} from 'redis';
 import { Client as OmClient } from 'redis-om'
 
-export default async function connectToRedis() {
+export default async function connectToRedis(): Promise<[redisClient: ReturnType<typeof createClient>, redis_om: OmClient]> {
     // Default port: 6379
     const redisClient = createClient({
         socket: {
