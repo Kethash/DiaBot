@@ -50,7 +50,7 @@ class DiaBot extends Client {
             if (!command) return;
         
             try {
-                if (this.diatabaseUnits["commands"].includes(interaction.commandName)) await command.execute(interaction, redisClient);
+                if (this.diatabaseUnits["commands"].includes(interaction.commandName)) await command.execute(redisClient, interaction);
                 else await command.execute(interaction);
             } catch (error) {
                 console.error(error);

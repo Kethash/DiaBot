@@ -24,7 +24,7 @@ export = {
             //     option.setName('max')
             //         .setDescription('Set the max accepted answers')
             // ),
-    async execute(interaction: any, redisClient: any) {
+    async execute(redisClient: any, interaction: any) {
         const name:string = interaction.options.get('name') ? interaction.options.get('name').value : "This is a quizz";
 
         const optionChoice: number = interaction.options.get('options').value;

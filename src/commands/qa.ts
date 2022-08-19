@@ -28,7 +28,7 @@ export = {
             //     option.setName('max')
             //         .setDescription('Set the max accepted answers')
             // ),
-    async execute(interaction: any, redisClient: any) {
+    async execute(redisClient: any, interaction: any) {
 
         const max_answers = interaction.options.get('max') ? interaction.options.get('max').value : 1;
         const timeAnswer = interaction.options.get('time') ? interaction.options.get('time').value : 60000;

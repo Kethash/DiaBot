@@ -9,7 +9,7 @@ export = {
                 .setDescription('The channel id you want to display the loveleavers')
                 .setRequired(true)),
 
-    async execute(interaction: any, redisClient: any) {
+    async execute(redisClient: any, interaction: any) {
         const newChannel: string = interaction.options.get('channelid').value;
         if (!interaction.guild.channels.cache.find((channel: GuildChannel) => channel.id == newChannel)) {
             await interaction.reply({content: "BUU BUU !! Channel not found", ephemeral: true});

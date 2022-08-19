@@ -9,7 +9,7 @@ export = {
                 .setDescription('The amount of time (in minutes)')
                 .setRequired(true)),
 
-    async execute(interaction: any, redisClient: any) {
+    async execute(redisClient:any, interaction: any) {
         const newTime: number = interaction.options.get('time').value;
         await redisClient.set(`${interaction.guild.id.toString()}:loveleavetime`, newTime);
 
