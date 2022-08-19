@@ -8,7 +8,7 @@ ___
 
 ### Prerequisites
 * NodeJs v.16.16.0
-* Redis
+* Redis with JSON and search modules
 * (Optionnal) Docker
 
 #### Run the bot
@@ -32,3 +32,17 @@ ___
         * To stop => `docker compose down`
 
 Have fun !
+
+#### Redis Database model
+|Server config|
+|---|
+|guildId: { type: 'string' } *The ID of the server*|
+|loveleaveChannelId: { type: 'string' } *The ID of the channel where Dia saaaan !!! casts loveleavers*|
+|loveleaveTime: { type: 'number' } *The amount of minutes to trigger the "loveleave"*|
+
+|Reported malicious link|
+|---|
+|guildId: { type: 'string' } *The ID of the server*|
+|messageContent: { type: 'text' } *The content of the message*|
+|reporter: { type: 'string'} *The user's ID who reported the message*|
+|reporterHread: { type: 'string'} *The user's tag and discriminant*|
