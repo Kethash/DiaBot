@@ -3,7 +3,7 @@ import connectToRedis from "../functions/connect-to-redis";
 import { createClient } from "redis";
 import { Client as OmClient } from 'redis-om'
 import { serverconfig, ServerConfigSchema } from "../models/diatabase";
-import { getAllConfigs } from "../controllers/server-configs";
+import { getAllConfigs, getAllIds, getAllServerconfigs } from "../controllers/server-configs";
 
 export = {
     name: 'ready',
@@ -19,15 +19,18 @@ export = {
 				name: guild.name
 			}
 		});
-		const serverRepositories: ServerConfigSchema[] = await getAllConfigs();
+		const serverIDs: string[] = await getAllIds();
 		
+		// entering new servers into the database
 		for (const guild of Guilds) {
-			serverSettingsRepository.createAndSave({
-				guildId: guild.id,
-				guildName: guild.name,
-				loveleaveChannelId: '',
-				loveleaveTime: 5
-			});
+			if (!serverIDs.includes(guild.id)) {
+				serverSettingsRepository.createAndSave({
+					guildId: guild.id,
+					guildName: guild.name,
+					loveleaveChannelId: '',
+					loveleaveTime: 5
+				});
+			}
 		}
 
 		await redisClient.quit();

@@ -12,11 +12,21 @@ export async function getAllConfigs(): Promise<ServerConfigSchema[]> {
     return res;
 }
 
+export async function getAllServerconfigs(): Promise<Record<string, any>[]> {
+    const [_redis, om]: [ReturnType<typeof createClient>, OmClient] = await connectToRedis();
+    const serverconfigRepository = om.fetchRepository(serverconfig);
+    serverconfigRepository.createIndex();
+    const res: ServerConfigSchema[] = await serverconfigRepository.search().return.all();
+    serverconfigRepository.dropIndex();
+    return res.map(e => e.toJSON());
+}
+
 export async function getAllIds(): Promise<string[]> {
     const [_redis, om]: [ReturnType<typeof createClient>, OmClient] = await connectToRedis();
     const serverconfigRepository = om.fetchRepository(serverconfig);
     serverconfigRepository.createIndex();
-    const res = await serverconfigRepository.search().return.all()
+    const repositories = await serverconfigRepository.search().return.all()
+    const res: string[] = repositories.map(e => e.toJSON().entityId);
 
     serverconfigRepository.dropIndex();
     return res;
