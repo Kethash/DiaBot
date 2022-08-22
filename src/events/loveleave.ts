@@ -17,8 +17,9 @@ export = {
     name: 'guildMemberRemove',
     async execute(redisClient: any, member: GuildMember) {
         const minutesElapsed: number = member.joinedAt ? getMinDiff(member.joinedAt, new Date()): 99;
-        const loveleavetime: number = await redisClient.get('loveleavetime');
-        const loveleavechannel: string = await redisClient.get('loveleavechannel')
+        const guildID: string = member.guild.id;
+        const loveleavetime: number = await redisClient.get(`${guildID}:loveleavetime`);
+        const loveleavechannel: string = await redisClient.get(`${guildID}:loveleavechannel`);
         const channel = member.guild.channels.cache.get(loveleavechannel) as TextChannel;
         if (minutesElapsed > loveleavetime) return;
 
