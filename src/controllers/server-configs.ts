@@ -47,7 +47,7 @@ export async function getGuildConfig(guildID: string): Promise<ServerConfigSchem
     const [_redis, om]: [ReturnType<typeof createClient>, OmClient] = await connectToRedis();
     const serverconfigRepository = om.fetchRepository(serverconfig);
     await serverconfigRepository.createIndex();
-    const res = await serverconfigRepository.search().where('guildId').matches(guildID).return.first();
+    const res = await serverconfigRepository.search().where('guildId').equals(guildID).return.first();
     return res == null ? null : res;
 }
 
@@ -55,6 +55,6 @@ export async function guildExists(guildID: string): Promise<Boolean> {
     const [_redis, om]: [ReturnType<typeof createClient>, OmClient] = await connectToRedis();
     const serverconfigRepository = om.fetchRepository(serverconfig);
     await serverconfigRepository.createIndex();
-    const res: ServerConfigSchema | null = await serverconfigRepository.search().where('guildId').matches(guildID).return.first();
+    const res: ServerConfigSchema | null = await serverconfigRepository.search().where('guildId').equals(guildID).return.first();
     return res == null ? false : true;
 }
