@@ -1,45 +1,68 @@
-import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import getPairs from '../functions/arrays';
 
 
 export = {
     data: new SlashCommandBuilder()
             .setName('quizz')
-            .setDescription('Start a quiz !')
-            .addIntegerOption(option =>
-                option.setName('options')
-                    .setDescription('Start or Stop a quizz')
-                    .setRequired(true)
-                    .addChoices(
-                        { name: 'start', value: 1 },
-                        { name: 'stop', value: 0 },
-                    ))
-            .addStringOption(option => 
-                option.setName('name')
-                    .setDescription('Set the name of the quizz')
-            ),
+            .setDescription('Start or stop a quiz !')
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName('start')
+                    .setDescription('Start a quizz')
+                    .addStringOption(option =>
+                        option.setName('quizzname')
+                        .setDescription('Give a name of the quizz')
+                        .setRequired(true)
+                    )
+                    .addStringOption(option =>
+                        option.setName('title')
+                        .setDescription('The quizz title to display')
+                    )
+                )
+                .addSubcommand(subcommand =>
+                    subcommand.setName('stop')
+                    .setDescription('Stop a quizz and print the leaderboard')
+                    .addStringOption(option =>
+                        option.setName('quizzname')
+                        .setDescription('The name of the quizz to stop')
+                        .setRequired(true)
+                    )
+                )
+                .addSubcommand(subcommand =>
+                    subcommand.setName('viewall')
+                    .setDescription('View all created quizzs')
+                )
+                ,
             
             //NOT IMPLEMENTED YET
             //.addIntegerOption(option => 
             //     option.setName('max')
             //         .setDescription('Set the max accepted answers')
             // ),
-    async execute(redisClient: any, interaction: any) {
-        const name:string = interaction.options.get('name') ? interaction.options.get('name').value : "This is a quizz";
+    async execute(redisClient: any, interaction: ChatInputCommandInteraction<CacheType>) {
+        const name:string = interaction.options.get('quizzname') ? (interaction.options.get('quizzname')?.value as string).toLowerCase() : "default";
+        const title: string = interaction.options.get('title') ? interaction.options.get('title')?.value as string : "BUU BUU QUIZZ DESUWA !!";
 
-        const optionChoice: number = interaction.options.get('options').value;
+        const optionChoice:string = interaction.options.getSubcommand();
 
-        if(optionChoice === 1) {
+        if(optionChoice === 'start') {
             const embed: EmbedBuilder = new EmbedBuilder()
                 .setColor('#FD5E53')
                 .setTitle('QUIZZ TIME !')
                 .setAuthor({ name: 'Dia Kurosawa'})
-                .setDescription(`Theme: ${name}`);
-            const key: string = `${interaction.guild.id.toString()}:quizz`;
+                .setDescription(`Theme: ${title}`);
+            const key: string = `${interaction.guild?.id.toString()}:quizz:${name}`;
             await redisClient.HSET(key, "name", name);
             await interaction.reply({embeds: [embed]});
-        } else {
-            const templeaderboard = await redisClient.sendCommand(["ZRANGE",`${interaction.guild.id.toString()}:quizz:leaderboard`,"0","10","WITHSCORES","REV"]);
+        } else if (optionChoice === 'stop') {
+
+            if (!(await redisClient.EXISTS(`${interaction.guild?.id.toString()}:quizz:${name}`)))
+            {
+                await interaction.reply({content: "Sorry the quizz doesn't exist. Try another name", ephemeral: true});
+                return;
+            }
+            const templeaderboard = await redisClient.sendCommand(["ZRANGE",`${interaction.guild?.id.toString()}:quizz:${name}:leaderboard`,"0","10","WITHSCORES","REV"]);
             const leaderboard = getPairs(templeaderboard).map((e: any[]) => {
                 return {
                     "name": e[1],
@@ -56,9 +79,22 @@ export = {
             await interaction.reply({embeds: [embed]});
 
             await redisClient.multi()
-            .DEL(`${interaction.guild.id.toString()}:quizz`)
-            .DEL(`${interaction.guild.id.toString()}:quizz:leaderboard`)
+            .DEL(`${interaction.guild?.id.toString()}:quizz:${name}`)
+            .DEL(`${interaction.guild?.id.toString()}:quizz:leaderboard:${name}`)
             .exec();
+        } else {
+            const quizzs: { name: string, value: string }[] = (await redisClient.KEYS(`${interaction.guild?.id.toString()}:quizz:*`)).map((e: string) => {
+                return {
+                    "name": e.split(":")[2],
+                    "value": '\u200b'
+                }
+            });
+            const embed: EmbedBuilder = new EmbedBuilder()
+                .setColor('#FD5E53')
+                .setTitle('Here are the current quizzs')
+                .setAuthor({ name: 'Dia Kurosawa'})
+                .setFields(quizzs);
+            await interaction.reply({embeds: [embed]});
         }
     }
 }

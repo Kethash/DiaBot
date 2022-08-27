@@ -1,4 +1,7 @@
+import { createConfig, getGuildConfig } from "../controllers/server-configs";
 import { SlashCommandBuilder } from "discord.js";
+import { serverconfig, ServerConfigSchema } from "../models/diatabase";
+import { setloveleavetime } from "../middlewares/server-config-operations";
 
 export = {
     data: new SlashCommandBuilder()
@@ -11,9 +14,18 @@ export = {
 
     async execute(redisClient:any, interaction: any) {
         const newTime: number = interaction.options.get('time').value;
-        await redisClient.set(`${interaction.guild.id.toString()}:loveleavetime`, newTime);
+        let serverConfig: ServerConfigSchema | null = await getGuildConfig(interaction.guild.id);
+        if (serverConfig == null) {
+            serverConfig = await createConfig(interaction.guild.id, interaction.guild.name);
+        }
+        try {
+            setloveleavetime(serverConfig.entityId,newTime);
+        } catch {
+            await interaction.reply({content: "Couldn't set the new loveleave! time. I'm sorry...", ephemeral: true});
+            return;
+        }
 
-        if (!(await redisClient.EXISTS(`${interaction.guild.id.toString()}:loveleavechannel`))) {
+        if (!serverConfig.loveleaveChannelSetup) {
             await interaction.reply({content: `Loveleavetime set on: ${newTime} minutes\n
             Be careful you didn't set any channel to display loveleavers 
             please use /setloveleavechannel <channelId> to define one`, ephemeral: true});
