@@ -26,7 +26,7 @@ export async function getAllIds(): Promise<string[]> {
     const serverconfigRepository = om.fetchRepository(serverconfig);
     await serverconfigRepository.createIndex();
     const repositories = await serverconfigRepository.search().return.all();
-    const res: string[] = repositories.map(e => e.toJSON().entityId);
+    const res: string[] = repositories.map(e => e.toJSON().guildId);
     serverconfigRepository.dropIndex();
     return res;
 }
