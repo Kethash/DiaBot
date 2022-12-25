@@ -19,3 +19,5 @@ rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: [] })
 rest.put(Routes.applicationCommands(clientID), { body: [] })
 	.then(() => console.log('Successfully deleted all application commands.'))
 	.catch(console.error);
+
+

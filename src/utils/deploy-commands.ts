@@ -28,6 +28,6 @@ rest.put(Routes.applicationCommands(clientID), { body: commands })
 	.catch(console.error);
 
 // FOR A SPECIFIC GUILD
-// rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: commands })
-// 	.then(() => console.log('Successfully registered application commands.'))
-// 	.catch(console.error);
+rest.put(Routes.applicationGuildCommands(clientID, '768507412155334707'), { body: commands })
+	.then(() => console.log('Successfully registered application commands for guild'))
+	.catch(console.error);

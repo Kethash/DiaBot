@@ -32,8 +32,7 @@ export = {
                 .addSubcommand(subcommand =>
                     subcommand.setName('viewall')
                     .setDescription('View all created quizzs')
-                )
-                ,
+                ),
             
             //NOT IMPLEMENTED YET
             //.addIntegerOption(option => 
