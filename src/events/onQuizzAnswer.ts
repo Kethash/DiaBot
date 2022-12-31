@@ -13,7 +13,7 @@ export = {
         const repliedTo = await message.channel.messages.fetch(message.reference?.messageId as string);
         // console.log('REPLIED TO', repliedTo);
         
-        if (repliedTo.author.id !== '1011342333943484528') return;
+        if (repliedTo.author.id !== '945096700043882506') return;
 
         let answer = await redisClient.json.get(`answer:${message.reference?.messageId}`, '.');
         
