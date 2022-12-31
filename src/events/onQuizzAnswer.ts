@@ -24,27 +24,27 @@ export = {
         // ぼく　は　Liyuu が　とても　すきです。
 
         let noEmotes = [
-            'Hanano:1058191475508256828',
-            'Hanayokotta:1058191475508256828',
-            'Bubudesuwa:1058191475508256828',
-            'DiaSmile:1058191475508256828',
-            'UmiPokerFace:1058191475508256828',
-            'ayumunohope:1058191475508256828',
-            'WutHonoka:1058191475508256828',
-            'youdisapointed:1058191475508256828',
-            'yuonegai:1058191475508256828'
+            ':Hanano:1058191475508256828',
+            ':Hanayokotta:1058191475508256828',
+            ':Bubudesuwa:1058191475508256828',
+            ':DiaSmile:1058191475508256828',
+            ':UmiPokerFace:1058191475508256828',
+            ':ayumunohope:1058191475508256828',
+            ':WutHonoka:1058191475508256828',
+            ':youdisapointed:1058191475508256828',
+            ':yuonegai:1058191475508256828'
         ];
 
         let yesEmotes = [
-            'YouThumbsUp:1058191475508256828',
-            'DiaLUL:1058191475508256828',
-            'UmiHappy:1058191475508256828',
-            'kanatablade:1058191475508256828',
-            'lanzhuproud:1058191475508256828',
-            'MariJoke:1058191475508256828',
-            'SetsunaFire:1058191475508256828',
-            'rubycool:1058191475508256828',
-            'eliapprove:1058191475508256828'
+            ':YouThumbsUp:1058191475508256828',
+            ':DiaLUL:1058191475508256828',
+            ':UmiHappy:1058191475508256828',
+            ':kanatablade:1058191475508256828',
+            ':lanzhuproud:1058191475508256828',
+            ':MariJoke:1058191475508256828',
+            ':SetsunaFire:1058191475508256828',
+            ':rubycool:1058191475508256828',
+            ':eliapprove:1058191475508256828'
         ];
 
         const yesEmote = yesEmotes[Math.floor(Math.random() * yesEmotes.length)];
