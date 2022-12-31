@@ -81,3 +81,16 @@ export const quizzplayer = new Schema(QuizzPlayerSchema, {
     quizzID: { type: 'string' },
     score: { type: 'number' }
 });
+
+export class AutoQuizz extends Entity {}
+export const autoquizz = new Schema(AutoQuizz, {
+    questions: {type: 'string'}, // Stringified JSON
+    player: {type: 'string'}
+})
+
+
+// export class QuestionSchema extends Entity {}
+// export const question = new Schema(QuestionSchema, {
+//     id: { type: 'string' },
+    
+// });

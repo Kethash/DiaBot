@@ -1,6 +1,7 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { ActionRowBuilder, Attachment, BufferResolvable, CacheType, ChatInputCommandInteraction, EmbedBuilder, Message, SelectMenuBuilder, SlashCommandBuilder, StringSelectMenuBuilder, TextBasedChannel, escapeMarkdown } from 'discord.js';
 import getPairs from '../functions/arrays';
-
+import fs from 'fs';
+import axios from 'axios';
 
 export = {
     data: new SlashCommandBuilder()
@@ -32,6 +33,24 @@ export = {
                 .addSubcommand(subcommand =>
                     subcommand.setName('viewall')
                     .setDescription('View all created quizzs')
+                )
+                .addSubcommand(subcommand =>
+                    subcommand.setName('auto')
+                    .setDescription('Starts an automatic Quizz')
+                    .addStringOption(option =>
+                        option.setName('quizzname')
+                        .setDescription("The name of the quizz you want to start")
+                        .setRequired(true)
+                    )
+                )
+                .addSubcommand(subcommand =>
+                    subcommand.setName('import')
+                    .setDescription('Import a quizz from a JSON file')
+                    .addAttachmentOption(option =>
+                        option.setName('file')
+                        .setDescription("Drop the JSON file")
+                        .setRequired(true)
+                    )
                 ),
             
             //NOT IMPLEMENTED YET
@@ -81,7 +100,7 @@ export = {
             .DEL(`${interaction.guild?.id.toString()}:quizz:${name}`)
             .DEL(`${interaction.guild?.id.toString()}:quizz:leaderboard:${name}`)
             .exec();
-        } else {
+        } else if (optionChoice == 'viewall') {
             const quizzs: { name: string, value: string }[] = (await redisClient.KEYS(`${interaction.guild?.id.toString()}:quizz:*`)).map((e: string) => {
                 return {
                     "name": e.split(":")[2],
@@ -93,7 +112,45 @@ export = {
                 .setTitle('Here are the current quizzs')
                 .setAuthor({ name: 'Dia Kurosawa'})
                 .setFields(quizzs);
-            await interaction.reply({embeds: [embed]});
+            await interaction.reply({embeds: [embed], ephemeral: true});
+        } else if (optionChoice == 'import') {
+
+            const attachment = interaction.options.getAttachment('file') as Attachment;
+            const response = await axios.get(attachment.url, {
+                headers: { "Accept-Encoding": "gzip,deflate,compress", accept: 'application/json' },
+                responseType: 'json'
+            });
+            const json: jsonquizz = response.data; // All the questions from the JSON file
+            const name: string = json.name.toLowerCase().split(' ').join('-');
+            redisClient.json.set(`quizz:${name}`, '.', json);
+            await interaction.reply({content: "Quizz importé", ephemeral: true});
+        } else if (optionChoice == 'auto') { // TODO: changer en 'play'
+            const quizzs = await redisClient.KEYS('quizz:*');
+            const options = [];
+            for (const quiz of quizzs) {
+                const [name, description]: [string, string] = await redisClient.json.get(quiz, {path: '$["name","description"]'});
+                console.log(name);
+                options.push({
+                    label: name,
+                    description: description,
+                    value: quiz,
+                });
+            }
+            
+            const row: ActionRowBuilder<any> = new ActionRowBuilder()
+                .addComponents(
+                    new StringSelectMenuBuilder()
+                        .setCustomId('selectquiz')
+                        .setPlaceholder('Please select a quizz')
+                        .addOptions(options),
+                );
+
+            const embed: EmbedBuilder = new EmbedBuilder()
+                .setColor("#FD5E53")
+                .setTitle('Which quiz you want to start ?');
+            
+            // TODO: Créer un event avec un message collector qui va récupérer les réponses des joueurs
+		    await interaction.reply({ embeds: [embed], components: [row] });
         }
     }
 }

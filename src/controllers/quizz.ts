@@ -9,6 +9,7 @@ export async function createQuizz(guildID: string, quizzName: string): Promise<s
     const newQuizz = await quizzRepository.createAndSave({
         name: quizzName,
         guildID: guildID,
+        players: [],
     })
 
     return newQuizz.entityId;

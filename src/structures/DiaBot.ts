@@ -1,4 +1,4 @@
-import { Client, Collection } from 'discord.js';
+import { Client, Collection, Events } from 'discord.js';
 import fs from 'fs';
 import connectToRedis from '../functions/connect-to-redis';
 import path from 'node:path';
@@ -6,7 +6,7 @@ import path from 'node:path';
 
 class DiaBot extends Client {
     private diatabaseUnits = {
-        'events': ['loveleave'],
+        'events': ['loveleave', 'startAutoQuiz', 'onQuizzAnswer'],
         'commands': ['setloveleavetime','setloveleavechannel','quizz', 'qa']
     }
 
@@ -43,7 +43,7 @@ class DiaBot extends Client {
             }
         }
 
-        this.on('interactionCreate', async interaction => {
+        this.on(Events.InteractionCreate, async interaction => {
             if (!interaction.isChatInputCommand()) return;
         
             const command: any = this.commands.get(interaction.commandName);
@@ -57,6 +57,12 @@ class DiaBot extends Client {
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
             }
         });
+
+        // Menu déroulant
+        // this.on(Events.InteractionCreate, async interaction => {
+        //     if (!interaction.isStringSelectMenu()) return;
+
+        // })
     }
 
 }
