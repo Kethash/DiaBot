@@ -37,11 +37,6 @@ export = {
                 .addSubcommand(subcommand =>
                     subcommand.setName('auto')
                     .setDescription('Starts an automatic Quizz')
-                    .addStringOption(option =>
-                        option.setName('quizzname')
-                        .setDescription("The name of the quizz you want to start")
-                        .setRequired(true)
-                    )
                 )
                 .addSubcommand(subcommand =>
                     subcommand.setName('import')
