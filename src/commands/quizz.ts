@@ -35,13 +35,8 @@ export = {
                     .setDescription('View all created quizzs')
                 )
                 .addSubcommand(subcommand =>
-                    subcommand.setName('auto')
+                    subcommand.setName('start')
                     .setDescription('Starts an automatic Quizz')
-                    .addStringOption(option =>
-                        option.setName('quizzname')
-                        .setDescription("The name of the quizz you want to start")
-                        .setRequired(true)
-                    )
                 )
                 .addSubcommand(subcommand =>
                     subcommand.setName('import')
@@ -124,7 +119,7 @@ export = {
             const name: string = json.name.toLowerCase().split(' ').join('-');
             redisClient.json.set(`quizz:${name}`, '.', json);
             await interaction.reply({content: "Quizz importé", ephemeral: true});
-        } else if (optionChoice == 'auto') { // TODO: changer en 'play'
+        } else if (optionChoice == 'start') { // TODO: changer en 'play'
             const quizzs = await redisClient.KEYS('quizz:*');
             const options = [];
             for (const quiz of quizzs) {
