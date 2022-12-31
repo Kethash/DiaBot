@@ -20,4 +20,4 @@ export default async function connectToRedis(): Promise<[redisClient: ReturnType
     return [redisClient, redis_om];
 }
 
-export const RedisClient = connectToRedis();
+// export const RedisClient = connectToRedis();
