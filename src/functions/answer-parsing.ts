@@ -13,12 +13,12 @@ export function compareAnswers(answer1: string, answer2: string, isStrict: boole
     let answerFormatted1 = formatString(answer1)
     let answerFormatted2 = formatString(answer2)
     
-    console.log('answerformatted1', answerFormatted1);
-    console.log('answerformatted2', answerFormatted2);
+    // console.log('answerformatted1', answerFormatted1);
+    // console.log('answerformatted2', answerFormatted2);
     
     const fuzzySet = FuzzySet([answerFormatted1]);
-    console.log(fuzzySet);
-    console.log('FUZZYSET', fuzzySet.get(answerFormatted2));
+    // console.log(fuzzySet);
+    // console.log('FUZZYSET', fuzzySet.get(answerFormatted2));
     
     if (isStrict) {
         return answerFormatted1 === answerFormatted2;

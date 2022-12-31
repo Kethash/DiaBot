@@ -129,7 +129,6 @@ export = {
             const options = [];
             for (const quiz of quizzs) {
                 const [name, description]: [string, string] = await redisClient.json.get(quiz, {path: '$["name","description"]'});
-                console.log(name);
                 options.push({
                     label: name,
                     description: description,

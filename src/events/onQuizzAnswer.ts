@@ -20,7 +20,7 @@ export = {
         // console.log('ANSWER', answer);
 
         let successToAnswer = answer.answers.split(';').some((answerString: string) => compareAnswers(message.content, answerString, answer?.isStrict ?? false));
-        console.log(successToAnswer);
+        // console.log(successToAnswer);
         // ぼく　は　Liyuu が　とても　すきです。
 
         let noEmotes = [
