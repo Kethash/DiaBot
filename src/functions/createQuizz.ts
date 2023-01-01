@@ -39,25 +39,29 @@ export async function createQuizzMessage(quizzName:string, userId: string, chann
 }
 
 export function isValidQuizz(jsonQuizz: jsonquizz): boolean {
+    try {
+        if (!('name' in jsonQuizz && 
+        'description' in jsonQuizz && 
+        'quizzs' in jsonQuizz)) return false;
 
-    if (!('name' in jsonQuizz && 
-    'description' in jsonQuizz && 
-    'quizzs' in jsonQuizz)) return false;
-    
-    //@ts-ignore
-    const quizz: Array<{
-        title?: string,
-        imageLink?: string,
-        blurImage?: boolean,
-        blurRate?: number,
-        answers?: string
-    }> = jsonQuizz.quizzs;
+        //@ts-ignore
+        const quizz: Array<{
+            title?: string,
+            imageLink?: string,
+            blurImage?: boolean,
+            blurRate?: number,
+            answers?: string
+        }> = jsonQuizz.quizzs;
 
 
 
-    return quizz.every(e => "title" in e &&
-    'imageLink' in e &&
-    'blurImage' in e &&
-    'blurRate' in e &&
-    'answers' in e);
+        return quizz.every(e => "title" in e &&
+        'imageLink' in e &&
+        'blurImage' in e &&
+        'blurRate' in e &&
+        'answers' in e);
+    } catch(e) {
+        // Catches the TypeError so the quiz's JSON structure is invalid
+        return false;
+    }
 }
