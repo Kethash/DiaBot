@@ -7,17 +7,17 @@ export async function createQuizzMessage(quizzName:string, userId: string, chann
     
     const question = quizzs[Math.floor(Math.random() * quizzs.length)];
     
-    const options: { embeds?: EmbedBuilder[] } = {};
+    const options: { embeds?: EmbedBuilder[], files?: AttachmentBuilder[] } = {};
     
-    if (question.imageLink && (question?.blurImage === true || question?.blurImage)) {
-        const buffer = (await axios.get(question.imageLink, { responseType: 'arraybuffer' })).data as Buffer;
-        console.log(buffer);
-        let blurredImageBuffer = await sharp(buffer).blur(45).toBuffer();
+    if (question.imageLink) {
+        let buffer = (await axios.get(question.imageLink, { responseType: 'arraybuffer' })).data as Buffer;
+        // console.log(buffer);
+        if (question?.blurImage === true) buffer = await sharp(buffer).blur(45).toBuffer();
         
         const imageFileName = question.imageLink.substring(question.imageLink.lastIndexOf('/') + 1);
-        console.log(imageFileName);
-        let blurredImageAttachment = new AttachmentBuilder(buffer, { name: imageFileName });
-        console.log(blurredImageAttachment);
+        // console.log(imageFileName);
+        const ImageAttachment = new AttachmentBuilder(buffer, { name: imageFileName });
+        // console.log(blurredImageAttachment);
         
         const embed: EmbedBuilder = new EmbedBuilder()
             .setColor("#FD5E53")
@@ -25,6 +25,7 @@ export async function createQuizzMessage(quizzName:string, userId: string, chann
             .setImage('attachment://' + imageFileName);
         
         options['embeds'] = [embed];
+        options['files'] = [ImageAttachment]
     }
 
     const message = await channel.send(options);
