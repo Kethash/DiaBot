@@ -35,7 +35,7 @@ export = {
                     .setDescription('View all created quizzs')
                 )
                 .addSubcommand(subcommand =>
-                    subcommand.setName('auto')
+                    subcommand.setName('play')
                     .setDescription('Starts an automatic Quizz')
                 )
                 .addSubcommand(subcommand =>
