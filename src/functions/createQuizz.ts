@@ -12,7 +12,7 @@ export async function createQuizzMessage(quizzName:string, userId: string, chann
     if (question.imageLink) {
         let buffer = (await axios.get(question.imageLink, { responseType: 'arraybuffer' })).data as Buffer;
         // console.log(buffer);
-        if (question?.blurImage === true) buffer = await sharp(buffer).blur(30).toBuffer();
+        if (question?.blurImage === true) buffer = await sharp(buffer).blur(question?.blurRate ?? 30).toBuffer();
         
         const imageFileName = question.imageLink.substring(question.imageLink.lastIndexOf('/') + 1);
         // console.log(imageFileName);
