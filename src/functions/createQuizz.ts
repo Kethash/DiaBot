@@ -37,3 +37,24 @@ export async function createQuizzMessage(quizzName:string, userId: string, chann
         quizz_id: quizzName
     });
 }
+
+export function isValidQuizz(jsonQuizz: jsonquizz): boolean {
+
+    if (!('name' in jsonQuizz && 
+    'description' in jsonQuizz && 
+    'quizzs' in jsonQuizz)) return false;
+    
+    //@ts-ignore
+    const quizz: {
+        title?: string,
+        imageLink?: string,
+        blurImage?: boolean,
+        blurRate?: number,
+        answers?: string
+    } = jsonQuizz.quizzs;
+    return "title" in quizz &&
+        'imageLink' in quizz &&
+        'blurImage' in quizz &&
+        'blurRate' in quizz &&
+        'answers' in quizz;
+}

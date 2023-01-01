@@ -2,6 +2,7 @@ import { ActionRowBuilder, Attachment, BufferResolvable, CacheType, ChatInputCom
 import getPairs from '../functions/arrays';
 import fs from 'fs';
 import axios from 'axios';
+import { isValidQuizz } from 'functions/createQuizz';
 
 export = {
     data: new SlashCommandBuilder()
@@ -46,6 +47,9 @@ export = {
                         .setDescription("Drop the JSON file")
                         .setRequired(true)
                     )
+                ).addSubcommand(subcommand =>
+                    subcommand.setName('delete')
+                    .setDescription('Remove an imported quizz')
                 ),
             
             //NOT IMPLEMENTED YET
@@ -116,9 +120,20 @@ export = {
                 responseType: 'json'
             });
             const json: jsonquizz = response.data; // All the questions from the JSON file
+
+            // Check the quizz structure
+            if(!(isValidQuizz(json))) {
+                await interaction.reply({content: "The quizz structure is invalid, the JSON file must be like"+
+                "```json\n{\n\tname: string,\n\tdescription: string,\n\tquizzs: [{\n\ttitle: string,\n\timageLink: string,\n\tblurImage: boolean,\n\tblurRate: number,\n\tanswers: string\n\t}]\n}```", 
+                    ephemeral: true
+                });
+                return;
+            }
+
+
             const name: string = json.name.toLowerCase().split(' ').join('-');
             redisClient.json.set(`quizz:${name}`, '.', json);
-            await interaction.reply({content: "Quizz importé", ephemeral: true});
+            await interaction.reply({content: "Quizz imported", ephemeral: true});
         } else if (optionChoice == 'auto') { // TODO: changer en 'play'
             const quizzs = await redisClient.KEYS('quizz:*');
             const options = [];
@@ -143,7 +158,31 @@ export = {
                 .setColor("#FD5E53")
                 .setTitle('Which quiz you want to start ?');
             
-            // TODO: Créer un event avec un message collector qui va récupérer les réponses des joueurs
+		    await interaction.reply({ embeds: [embed], components: [row] });
+        } else if(optionChoice == 'delete') {
+            const quizzs = await redisClient.KEYS('quizz:*');
+            const options = [];
+            for (const quiz of quizzs) {
+                const [name, description]: [string, string] = await redisClient.json.get(quiz, {path: '$["name","description"]'});
+                options.push({
+                    label: name,
+                    description: description,
+                    value: quiz,
+                });
+            }
+
+            const row: ActionRowBuilder<any> = new ActionRowBuilder()
+                .addComponents(
+                    new StringSelectMenuBuilder()
+                        .setCustomId('removequizz')
+                        .setPlaceholder('Please select a quizz')
+                        .addOptions(options),
+                );
+
+            const embed: EmbedBuilder = new EmbedBuilder()
+                .setColor("#FD5E53")
+                .setTitle('Which quiz you want to remove ?');
+
 		    await interaction.reply({ embeds: [embed], components: [row] });
         }
     }

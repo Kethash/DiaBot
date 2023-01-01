@@ -13,5 +13,5 @@ declare type autoquizz = {
 declare type jsonquizz = {
   name: string, 
   description: string, 
-  quizzs: Array<{imageLink: string, answers: string}>
+  quizzs: Array<{title: string, imageLink: string, blurImage: boolean, blurRate: number, answers: string}>
 }

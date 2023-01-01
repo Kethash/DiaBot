@@ -6,7 +6,7 @@ import path from 'node:path';
 
 class DiaBot extends Client {
     private diatabaseUnits = {
-        'events': ['loveleave', 'startAutoQuiz', 'onQuizzAnswer'],
+        'events': ['loveleave', 'startAutoQuiz', 'onQuizzAnswer', 'removeAutoQuiz'],
         'commands': ['setloveleavetime','setloveleavechannel','quizz', 'qa']
     }
 
