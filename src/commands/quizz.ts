@@ -120,7 +120,7 @@ export = {
             });
 
 
-            const json: jsonquizz = JSON.parse(response.data); // All the questions from the JSON file
+            const json: jsonquizz = response.data; // All the questions from the JSON file
 
             // Check the quizz structure
             if(!(isValidQuizz(json))) {

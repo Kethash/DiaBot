@@ -45,16 +45,19 @@ export function isValidQuizz(jsonQuizz: jsonquizz): boolean {
     'quizzs' in jsonQuizz)) return false;
     
     //@ts-ignore
-    const quizz: {
+    const quizz: Array<{
         title?: string,
         imageLink?: string,
         blurImage?: boolean,
         blurRate?: number,
         answers?: string
-    } = jsonQuizz.quizzs;
-    return "title" in quizz &&
-        'imageLink' in quizz &&
-        'blurImage' in quizz &&
-        'blurRate' in quizz &&
-        'answers' in quizz;
+    }> = jsonQuizz.quizzs;
+
+
+
+    return quizz.every(e => "title" in e &&
+    'imageLink' in e &&
+    'blurImage' in e &&
+    'blurRate' in e &&
+    'answers' in e);
 }
