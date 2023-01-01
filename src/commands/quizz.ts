@@ -118,7 +118,9 @@ export = {
                 headers: { "Accept-Encoding": "gzip,deflate,compress", accept: 'application/json' },
                 responseType: 'json'
             });
-            const json: jsonquizz = response.data; // All the questions from the JSON file
+
+
+            const json: jsonquizz = JSON.parse(response.data); // All the questions from the JSON file
 
             // Check the quizz structure
             if(!(isValidQuizz(json))) {
