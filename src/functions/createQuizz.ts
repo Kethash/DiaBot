@@ -14,7 +14,7 @@ export async function createQuizzMessage(quizzName:string, userId: string, chann
         // console.log(buffer);
         if (question?.blurImage === true) buffer = await sharp(buffer).blur(question.blurRate).toBuffer();
         
-        const imageFileName = question.imageLink.substring(question.imageLink.lastIndexOf('/') + 1);
+        const imageFileName = encodeURIComponent(question.imageLink.substring(question.imageLink.lastIndexOf('/') + 1));
         // console.log(imageFileName);
         const ImageAttachment = new AttachmentBuilder(buffer, { name: imageFileName });
         // console.log(blurredImageAttachment);
