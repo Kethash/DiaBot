@@ -135,8 +135,9 @@ export = {
             const name: string = json.name.toLowerCase().split(' ').join('-');
             redisClient.json.set(`quizz:${name}`, '.', json);
             await interaction.reply({content: "Quizz imported", ephemeral: true});
-        } else if (optionChoice == 'auto') { // TODO: changer en 'play'
+        } else if (optionChoice == 'play') {
             const quizzs = await redisClient.KEYS('quizz:*');
+            if (quizzs.length == 0 || quizzs == null) await interaction.reply({content: 'There is no quizz'});
             const options = [];
             for (const quiz of quizzs) {
                 const [name, description]: [string, string] = await redisClient.json.get(quiz, {path: '$["name","description"]'});
@@ -162,6 +163,7 @@ export = {
 		    await interaction.reply({ embeds: [embed], components: [row] });
         } else if(optionChoice == 'delete') {
             const quizzs = await redisClient.KEYS('quizz:*');
+            if (quizzs.length == 0 || quizzs == null) await interaction.reply({content: 'There is no quizz'});
             const options = [];
             for (const quiz of quizzs) {
                 const [name, description]: [string, string] = await redisClient.json.get(quiz, {path: '$["name","description"]'});
