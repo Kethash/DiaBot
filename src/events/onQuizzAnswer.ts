@@ -42,7 +42,7 @@ export = {
         ];
 
         const yesEmote = yesEmotes[Math.floor(Math.random() * yesEmotes.length)];
-        const noEmote = yesEmotes[Math.floor(Math.random() * yesEmotes.length)];
+        const noEmote = noEmotes[Math.floor(Math.random() * noEmotes.length)];
 
         if (successToAnswer) message.reply(`${yesEmote} Correct ! ❤ ${yesEmote}`)
         else message.reply(`${noEmote} BUU BUU DESUWA ! ${noEmote}\n Corrects answers were : \n - ${answer.answers.replace(';', '\n - ')} `)
