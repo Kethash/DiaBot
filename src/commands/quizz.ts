@@ -1,8 +1,7 @@
-import { ActionRowBuilder, Attachment, BufferResolvable, CacheType, ChatInputCommandInteraction, EmbedBuilder, Message, SelectMenuBuilder, SlashCommandBuilder, StringSelectMenuBuilder, TextBasedChannel, escapeMarkdown } from 'discord.js';
+import { ActionRowBuilder, Attachment, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
 import getPairs from '../functions/arrays';
-import fs from 'fs';
 import axios from 'axios';
-import { isValidQuizz } from 'functions/createQuizz';
+import { isValidQuizz } from '../functions/createQuizz';
 
 export = {
     data: new SlashCommandBuilder()
