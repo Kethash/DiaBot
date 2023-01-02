@@ -18,11 +18,11 @@ export async function createQuizzMessage(quizzName:string, userId: string, chann
         const ImageAttachment = new AttachmentBuilder(buffer, { name: imageFileName });
         
         options = await createQuizEmbed(
-                ImageAttachment,
                 question?.title ?? "What is the title of this song ? Reply to this message to respond :)", 
-                imageFileName
+                imageFileName,
+                ImageAttachment
             );
-    } 
+    } else options = await createQuizEmbed(question?.title ?? "What is the title of this song ? Reply to this message to respond :)");
 
     const message = await channel.send(options);
     
@@ -62,17 +62,18 @@ export function isValidQuizz(jsonQuizz: jsonquizz): boolean {
     }
 }
 
-async function createQuizEmbed(attachment: AttachmentBuilder, title: string, imageFileName: string): Promise<Options> {
+async function createQuizEmbed(title: string, imageFileName?: string, attachment?: AttachmentBuilder): Promise<Options> {
     
     const options: Options = {};
     const embed: EmbedBuilder = new EmbedBuilder()
             .setColor("#FD5E53")
             .setTitle(title)
-            .setImage('attachment://' + imageFileName);
 
+    if (typeof attachment !== 'undefined' && typeof imageFileName !== 'undefined') {
+        embed.setImage('attachment://' + imageFileName);
+        options['files'] = [attachment];
+    }
     options['embeds'] = [embed];
-    options['files'] = [attachment];
-
     return options;
 }
 
