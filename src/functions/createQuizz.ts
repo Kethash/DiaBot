@@ -14,13 +14,13 @@ export async function createQuizzMessage(quizzName:string, userId: string, chann
         // console.log(buffer);
         if (question?.blurImage === true) buffer = await sharp(buffer).blur(question.blurRate).toBuffer();
         
-        // Test with no file extension given 
-        const ImageAttachment = new AttachmentBuilder(buffer, { name: 'image' });
+        const imageFileName = 'image.' + question.imageLink.substring(question.imageLink.lastIndexOf('.') + 1);
+        const ImageAttachment = new AttachmentBuilder(buffer, { name: imageFileName });
         
         options = await createQuizEmbed(
                 ImageAttachment,
                 question?.title ?? "What is the title of this song ? Reply to this message to respond :)", 
-                'image'
+                imageFileName
             );
     } 
 
