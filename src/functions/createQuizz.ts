@@ -7,7 +7,7 @@ export async function createQuizzMessage(quizzName:string, userId: string, chann
     
     const question = quizzs[Math.floor(Math.random() * quizzs.length)];
     
-    const options: { embeds?: EmbedBuilder[], files?: AttachmentBuilder[] } = {};
+    let options: Options = {};
     
     if (question.imageLink) {
         let buffer = (await axios.get(question.imageLink, { responseType: 'arraybuffer' })).data as Buffer;
@@ -19,14 +19,12 @@ export async function createQuizzMessage(quizzName:string, userId: string, chann
         const ImageAttachment = new AttachmentBuilder(buffer, { name: imageFileName });
         // console.log(blurredImageAttachment);
         
-        const embed: EmbedBuilder = new EmbedBuilder()
-            .setColor("#FD5E53")
-            .setTitle(question?.title ?? "What is the title of this song ? Reply to this message to respond :)")
-            .setImage('attachment://' + imageFileName);
-        
-        options['embeds'] = [embed];
-        options['files'] = [ImageAttachment]
-    }
+        options = await createQuizEmbed(
+                ImageAttachment,
+                question?.title ?? "What is the title of this song ? Reply to this message to respond :)", 
+                imageFileName
+            );
+    } 
 
     const message = await channel.send(options);
     
@@ -64,4 +62,24 @@ export function isValidQuizz(jsonQuizz: jsonquizz): boolean {
         // Catches the TypeError so the quiz's JSON structure is invalid
         return false;
     }
+}
+
+async function createQuizEmbed(attachment: AttachmentBuilder, title: string, imageFileName: string): Promise<Options> {
+    
+    const options: Options = {};
+    const embed: EmbedBuilder = new EmbedBuilder()
+            .setColor("#FD5E53")
+            .setTitle(title)
+            .setImage('attachment://' + imageFileName);
+
+    options['embeds'] = [embed];
+    options['files'] = [attachment];
+
+    return options;
+}
+
+
+type Options = {
+    embeds?: EmbedBuilder[], 
+    files?: AttachmentBuilder[]
 }
