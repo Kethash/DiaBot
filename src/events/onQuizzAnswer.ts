@@ -8,9 +8,9 @@ export = {
     async execute(redisClient: any, message: Message) {
         if (message.author.bot) return;
         if (!(message.type === MessageType.Reply)) return;
-        
+
         const repliedTo = await message.channel.messages.fetch(message.reference?.messageId as string);
-        
+
         if (repliedTo.author.id !== config.clientID) return;
 
         let answer = await redisClient.json.get(`answer:${message.reference?.messageId}`, '.');
@@ -19,7 +19,7 @@ export = {
         let successToAnswer = answer.answers.split(';').some((answerString: string) => compareAnswers(message.content, answerString, answer?.isStrict ?? false));
 
         let noEmotes = [
-            '<:Hanano:964268713740222484>', 
+            '<:Hanano:964268713740222484>',
             '<:Hanayokotta:964268716781101086>',
             '<:Bubudesuwa:809220132319526932>',
             '<:DiaSmile:827687467175903252>',
@@ -46,7 +46,7 @@ export = {
         const noEmote = noEmotes[Math.floor(Math.random() * noEmotes.length)];
 
         if (successToAnswer) message.reply(`${yesEmote} Correct ! ❤ ${yesEmote}`)
-        else await message.reply(`${noEmote} BUU BUU DESUWA ! ${noEmote}\n Corrects answers were : \n - ${answer.answers.replace(';', '\n - ')} `)
+        else await message.reply(`${noEmote} BUU BUU DESUWA ! ${noEmote}\n Corrects answers were : \n - ${answer.answers.replaceAll(';', '\n - ')} `)
 
         // Suppression clef
         await redisClient.json.del(`answer:${message.reference?.messageId}`, '.');
@@ -54,8 +54,8 @@ export = {
         const quizzName = answer.quizz_id;
         const channel: TextChannel = message.channel as TextChannel;
         const userId = message.author.id;
-        
+
         await createQuizzMessage(quizzName, userId, channel, redisClient);
-      
+
     }
 }
