@@ -1,5 +1,5 @@
 import { Events, Interaction, TextChannel } from "discord.js";
-import { createQuizzMessage } from "../functions/createQuizz";
+import { sendQuizzMessage } from "../functions/quizz";
 
 export = {
     name: Events.InteractionCreate,
@@ -12,12 +12,12 @@ export = {
         const userId = interaction.user.id;
 
         await interaction.reply("Quizz is starting !");
-        
-        await createQuizzMessage(quizzName, userId, channel, redisClient);
-      
+
+        await sendQuizzMessage(quizzName, userId, channel, redisClient);
+
         // Launch
 
-        
+
         // for (let idx=0; idx < quizz.length; idx++) {
         //     console.log(quizz[idx].answers)
         //     const filter = (m: Message) => compareAnswers(m.content, quizz[idx].answers,false);
@@ -27,10 +27,10 @@ export = {
         //     channel.send({embeds: [embed]})
         //     const collector = channel.createMessageCollector({ filter, max: 1, time: 30000 });
         //     await new Promise(resolve => collector.once('collect', async (message) => {
-                
+
         //         resolve(message);
         //     }));
-            
+
 
         // }
 

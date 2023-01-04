@@ -6,14 +6,14 @@ import path from 'node:path';
 
 class DiaBot extends Client {
     private diatabaseUnits = {
-        'events': ['loveleave', 'startAutoQuiz', 'onQuizzAnswer', 'removeAutoQuiz'],
-        'commands': ['setloveleavetime','setloveleavechannel','quizz', 'qa']
+        'events': ['loveleave', 'startQuiz', 'onQuizzAnswer', 'removeQuiz', 'onQuizzReaction'],
+        'commands': ['setloveleavetime', 'setloveleavechannel', 'quizz', 'qa']
     }
 
     commands = new Collection()
 
     async start(): Promise<void> {
-        
+
         const [redisClient, redis_om] = await connectToRedis();
 
         const commandsPath = path.join(__dirname, '../commands');
@@ -27,7 +27,7 @@ class DiaBot extends Client {
             this.commands.set(command.data.name, command);
         }
 
-        
+
         const eventsPath = path.join(__dirname, '../events');
         const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
@@ -36,7 +36,7 @@ class DiaBot extends Client {
             const event = require(filePath);
             if (event.once) {
                 this.once(event.name, (...args) => event.execute(...args));
-            } else if (this.diatabaseUnits["events"].includes(file.replace('.js',''))) {
+            } else if (this.diatabaseUnits["events"].includes(file.replace('.js', ''))) {
                 this.on(event.name, (...args) => event.execute(redisClient, ...args));
             } else {
                 this.on(event.name, (...args) => event.execute(...args));
@@ -45,10 +45,10 @@ class DiaBot extends Client {
 
         this.on(Events.InteractionCreate, async interaction => {
             if (!interaction.isChatInputCommand()) return;
-        
+
             const command: any = this.commands.get(interaction.commandName);
             if (!command) return;
-        
+
             try {
                 if (this.diatabaseUnits["commands"].includes(interaction.commandName)) await command.execute(redisClient, interaction);
                 else await command.execute(interaction);
