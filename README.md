@@ -16,9 +16,10 @@ ___
 1. Create a config.json with inside
 ```json
 {
-    "token": YOUR BOT TOKEN,
-    "clientID": YOUR DISCORD ACCOUNT ID,
-    "guildID": YOUR TEST SERVER ID (Not necessary if you  want to deploy global slash command)
+   "token": "YOUR BOT TOKEN",
+   "clientID": "YOUR DISCORD ACCOUNT ID",
+   "guildID": "YOUR TEST SERVER ID (Not necessary if you  want to deploy global slash command)",
+   "SENTRY_DNS": "SENTRY_DNS"
 }
 ```
 

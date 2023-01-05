@@ -1,11 +1,22 @@
 // Require the necessary discord.js classes
-import { GatewayIntentBits, Partials } from 'discord.js';
+import * as Sentry from "@sentry/node";
+import "@sentry/tracing";
 import config from '../config.json';
+
+Sentry.init({
+    dsn: config.SENTRY_DNS,
+
+    // We recommend adjusting this value in production, or using tracesSampler
+    // for finer control
+    tracesSampleRate: 1.0,
+});
+
+import { GatewayIntentBits, Partials } from 'discord.js';
 import { DiaBot } from './structures/DiaBot';
 
 // Create a new client instance
 const client = new DiaBot({
-    intents: [GatewayIntentBits.Guilds, 
+    intents: [GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildPresences,

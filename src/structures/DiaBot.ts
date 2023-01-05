@@ -2,7 +2,7 @@ import { Client, Collection, Events } from 'discord.js';
 import fs from 'fs';
 import connectToRedis from '../functions/connect-to-redis';
 import path from 'node:path';
-
+import * as Sentry from "@sentry/node";
 
 class DiaBot extends Client {
     private diatabaseUnits = {
@@ -35,11 +35,29 @@ class DiaBot extends Client {
             const filePath = path.join(eventsPath, file);
             const event = require(filePath);
             if (event.once) {
-                this.once(event.name, (...args) => event.execute(...args));
+                this.once(event.name, (...args) => {
+                    try {
+                        event.execute(...args);
+                    } catch (e) {
+                        Sentry.captureException(e);
+                    }
+                });
             } else if (this.diatabaseUnits["events"].includes(file.replace('.js', ''))) {
-                this.on(event.name, (...args) => event.execute(redisClient, ...args));
+                this.on(event.name, (...args) => {
+                    try {
+                        event.execute(redisClient, ...args);
+                    } catch (e) {
+                        Sentry.captureException(e);
+                    }
+                });
             } else {
-                this.on(event.name, (...args) => event.execute(...args));
+                this.on(event.name, (...args) => {
+                    try {
+                        event.execute(...args);
+                    } catch (e) {
+                        Sentry.captureException(e);
+                    }
+                });
             }
         }
 

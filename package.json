@@ -15,6 +15,8 @@
   "license": "ISC",
   "dependencies": {
     "@discordjs/rest": "^1.0.1",
+    "@sentry/node": "^7.29.0",
+    "@sentry/tracing": "^7.29.0",
     "axios": "^1.2.1",
     "discord.js": "^14.2.0",
     "fuzzyset": "^1.0.7",
