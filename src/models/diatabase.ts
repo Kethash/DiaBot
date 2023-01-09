@@ -34,14 +34,6 @@ export const serverconfig = new Schema(ServerConfigSchema, {
 	loveleaveTime: { type: 'number' }
 });
 
-export class ReportedLinkSchema extends Entity {}
-export const reportedlink = new Schema(ReportedLinkSchema, {
-    guildId: { type: 'string' },
-    messageContent: { type: 'text' },
-    reporter: { type: 'string'},
-    reporterHread: { type: 'string'}
-});
-
 export interface QuizzSchema {
     name: string,
     guildID: string,
@@ -92,5 +84,5 @@ export const autoquizz = new Schema(AutoQuizz, {
 // export class QuestionSchema extends Entity {}
 // export const question = new Schema(QuestionSchema, {
 //     id: { type: 'string' },
-    
+
 // });

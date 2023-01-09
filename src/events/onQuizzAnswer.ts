@@ -28,5 +28,14 @@ export = {
         const userId = message.author.id;
 
         await sendQuizzMessage(quizzName, userId, channel, redisClient);
+
+        let playerProfile = await redisClient.json.get(`answer:player:${message.author.id}`, '.');
+        if (playerProfile === null) playerProfile = { };
+        if (!playerProfile.quizzs) playerProfile.quizzs = {};
+        if (!playerProfile.quizzs[answer.quizz_id]) {
+            playerProfile.quizzs[answer.quizz_id] = { playCount: 0, quizz_id: answer.quizz_id };
+        }
+        playerProfile.quizzs[answer.quizz_id].playCount++;
+        await redisClient.json.set(`answer:player:${message.author.id}`, '.', playerProfile);
     }
 }
