@@ -97,6 +97,15 @@ export = {
             let player = interaction.user;
             let playerId = interaction.user.id;
             const playerStats = await redisClient.json.get(`answer:player:${playerId}`, '.');
+            if ( playerStats.length == 0 || playerStats == null) {
+                interaction.reply({embeds: [
+                    new EmbedBuilder()
+                        .setColor("#FD5E53")
+                        .setTitle(`BUU BUU DESUWA !`)
+                        .setDescription(`There is no data !`)
+                ]})
+                return;
+            }
             let quizzIds = Object.keys(playerStats.quizzs);
             let quizzsPromises = quizzIds.map((quizzId) => redisClient.json.get(quizzId, '.'));
             let quizzs = await Promise.all(quizzsPromises);
