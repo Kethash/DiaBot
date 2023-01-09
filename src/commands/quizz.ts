@@ -97,7 +97,7 @@ export = {
             let player = interaction.user;
             let playerId = interaction.user.id;
             const playerStats = await redisClient.json.get(`answer:player:${playerId}`, '.');
-            if ( playerStats.length == 0 || playerStats == null) {
+            if ( playerStats == null ) {
                 interaction.reply({embeds: [
                     new EmbedBuilder()
                         .setColor("#FD5E53")
