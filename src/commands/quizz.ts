@@ -1,6 +1,7 @@
-import { ActionRowBuilder, Attachment, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, Attachment, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageComponentInteraction, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
 import axios from 'axios';
 import { isValidQuizz } from '../functions/quizz';
+import { createJoinLobbyMessageCollector, createStartGameMessageCollector } from '../functions/lobbyManager';
 
 export = {
     data: new SlashCommandBuilder()
@@ -25,6 +26,9 @@ export = {
         .addSubcommand(subcommand =>
             subcommand.setName('stats')
                 .setDescription('View a player\'s stats')
+        ).addSubcommand(subcommand =>
+            subcommand.setName('multiplayer')
+                .setDescription("Play a multiplayer quizz")
         ),
 
 
@@ -97,23 +101,25 @@ export = {
             let player = interaction.user;
             let playerId = interaction.user.id;
             const playerStats = await redisClient.json.get(`answer:player:${playerId}`, '.');
-            if ( playerStats == null ) {
-                interaction.reply({embeds: [
-                    new EmbedBuilder()
-                        .setColor("#FD5E53")
-                        .setTitle(`BUU BUU DESUWA !`)
-                        .setDescription(`There is no data !`)
-                ]})
+            if (playerStats == null) {
+                interaction.reply({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setColor("#FD5E53")
+                            .setTitle(`BUU BUU DESUWA !`)
+                            .setDescription(`There is no data !`)
+                    ]
+                })
                 return;
             }
             let quizzIds = Object.keys(playerStats.quizzs);
             let quizzsPromises = quizzIds.map((quizzId) => redisClient.json.get(quizzId, '.'));
             let quizzs = await Promise.all(quizzsPromises);
             // @ts-ignore
-            let description:string = Object.values(playerStats.quizzs).map(({playCount, quizz_id}, index) => {
+            let description: string = Object.values(playerStats.quizzs).map(({ playCount, quizz_id }, index) => {
                 return `- ${quizzs[index].name} : ${playCount} plays`
             }).reduce((previousValue, currentValue) => {
-                return previousValue === '' ? currentValue :  previousValue  + '\n'
+                return previousValue === '' ? currentValue : previousValue + '\n'
             }, '');
 
             console.log(description)
@@ -152,6 +158,79 @@ export = {
                 .setTitle('Which quiz you want to remove ?');
 
             await interaction.reply({ embeds: [embed], components: [row] });
+        } else if (optionChoice == 'multiplayer') {
+            // QUIZZ SELECTION
+            const quizzs = await redisClient.KEYS('quizz:*');
+            if (quizzs.length == 0 || quizzs == null) {
+                await interaction.reply({ content: 'There is no quizz available :/' });
+                return;
+            };
+            const options = [];
+            for (const quiz of quizzs) {
+                const [name, description]: [string, string] = await redisClient.json.get(quiz, { path: '$["name","description"]' });
+                options.push({
+                    label: name,
+                    description: description,
+                    value: quiz,
+                });
+            }
+
+            const rowSelectQuizz: ActionRowBuilder<any> = new ActionRowBuilder()
+                .addComponents(
+                    new StringSelectMenuBuilder()
+                        .setCustomId('selectquiz')
+                        .setPlaceholder('Select a quizz')
+                        .addOptions(options),
+                );
+
+            const embed: EmbedBuilder = new EmbedBuilder()
+                .setColor("#FD5E53")
+                .setTitle('Which quizz do you want to play ?');
+            
+            const gameId: string = `${interaction.user.id}:${Date.now()}`;
+            const ownerId: string = interaction.user.id;
+            const joinId = `multiplayerjoin-${ownerId}`;
+            const startId = `multiplayerstart-${ownerId}`;
+
+            // SEND QUIZZ SELECTION AND WAIT FOR RESPONSE
+            let response = await interaction.reply({ embeds: [embed], components: [rowSelectQuizz] })
+
+            const filter = (i: any) => (i.user.id === ownerId);
+            const collector = response.createMessageComponentCollector({ filter, time: 6000, max: 1 })
+
+            collector.on('collect', async (i: any) => {
+                // ON QUIZZ SELECTION RESPONSE, ALLOW TO JOIN AND START GAME
+                const quizzName = i.values[0];
+                await redisClient.json.set(`quizz:multiplayer:lobby:${gameId}`,'.', {
+                    guildId: interaction.guildId,
+                    quizzEndCounter: 20,
+                    quizzId: quizzName,
+                    players: {},
+                    actualQuizzCount: 0,
+                })
+
+                const joinButton = new ButtonBuilder()
+                .setCustomId(joinId)
+                .setLabel('Join party')
+                .setStyle(ButtonStyle.Primary)
+
+                const startButton = new ButtonBuilder()
+                    .setCustomId(startId)
+                    .setLabel('Start !')
+                    .setStyle(ButtonStyle.Success)
+
+                const row: ActionRowBuilder<any> = new ActionRowBuilder()
+                    .addComponents(joinButton, startButton);
+
+                const messageLobby: string = `${interaction.user.toString()} started a multiplayer lobby !`;
+
+                createStartGameMessageCollector(redisClient, interaction, quizzName ,startId, ownerId, gameId);
+                createJoinLobbyMessageCollector(redisClient, interaction, joinId, ownerId);
+
+                await interaction.reply({ content: messageLobby, components: [row] });
+            });
+            
+            
         }
     }
 }
