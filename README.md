@@ -47,3 +47,8 @@ Have fun !
 |messageContent: { type: 'text' } *The content of the message*|
 |reporter: { type: 'string'} *The user's ID who reported the message*|
 |reporterHread: { type: 'string'} *The user's tag and discriminant*|
+
+___
+### About
+
+Contributors: [TomBerriot](https://github.com/Kethash/DiaBot/pulls?q=is%3Apr+author%3ATomBerriot)
