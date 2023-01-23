@@ -158,7 +158,7 @@ export = {
                 .setTitle('Which quiz you want to remove ?');
 
             await interaction.reply({ embeds: [embed], components: [row] });
-        } else if (optionChoice == 'multiplayer') {
+        } else if (optionChoice === 'multiplayer') {
             // QUIZZ SELECTION
             const quizzs = await redisClient.KEYS('quizz:*');
             if (quizzs.length == 0 || quizzs == null) {
@@ -186,7 +186,7 @@ export = {
             const embed: EmbedBuilder = new EmbedBuilder()
                 .setColor("#FD5E53")
                 .setTitle('Which quizz do you want to play ?');
-            
+
             const gameId: string = `${interaction.user.id}:${Date.now()}`;
             const ownerId: string = interaction.user.id;
             const joinId = `multiplayerjoin-${ownerId}`;
@@ -200,11 +200,11 @@ export = {
 
             collector.on('collect', async (i: any) => {
                 // ON QUIZZ SELECTION RESPONSE, ALLOW TO JOIN AND START GAME
-                const quizzName = i.values[0];
+                const quizzId = i.values[0];
                 await redisClient.json.set(`quizz:multiplayer:lobby:${gameId}`,'.', {
                     guildId: interaction.guildId,
                     quizzEndCounter: 20,
-                    quizzId: quizzName,
+                    quizzId: quizzId,
                     players: {},
                     actualQuizzCount: 0,
                 })
@@ -224,13 +224,13 @@ export = {
 
                 const messageLobby: string = `${interaction.user.toString()} started a multiplayer lobby !`;
 
-                createStartGameMessageCollector(redisClient, interaction, quizzName ,startId, ownerId, gameId);
-                createJoinLobbyMessageCollector(redisClient, interaction, joinId, ownerId);
+                createStartGameMessageCollector(redisClient, interaction, quizzId ,startId, ownerId, gameId);
+                createJoinLobbyMessageCollector(redisClient, interaction, joinId, gameId);
 
                 await interaction.reply({ content: messageLobby, components: [row] });
             });
-            
-            
+
+
         }
     }
 }
