@@ -43,6 +43,8 @@ export = {
 
         const optionChoice: string = interaction.options.getSubcommand();
 
+        console.log(optionChoice)
+
         if (optionChoice == 'import') {
 
             const attachment = interaction.options.getAttachment('file') as Attachment;
@@ -159,6 +161,7 @@ export = {
 
             await interaction.reply({ embeds: [embed], components: [row] });
         } else if (optionChoice === 'multiplayer') {
+            console.log('multiplayer')
             // QUIZZ SELECTION
             const quizzs = await redisClient.KEYS('quizz:*');
             if (quizzs.length == 0 || quizzs == null) {
@@ -184,7 +187,7 @@ export = {
                 );
 
             const embed: EmbedBuilder = new EmbedBuilder()
-                .setColor("#FD5E53")
+                .setColor('#FD5E53')
                 .setTitle('Which quizz do you want to play ?');
 
             const gameId: string = `${interaction.user.id}:${Date.now()}`;

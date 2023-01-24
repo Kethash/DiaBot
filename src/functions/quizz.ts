@@ -29,6 +29,8 @@ let yesEmotes = [
 export async function sendQuizzMessage(quizzName: string, userId: string, channel: TextChannel, redisClient: any, gameId: string | null ): Promise<void> {
     const quizzs: Array<{ title: string, imageLink: string, blurImage: boolean, blurRate: number, answers: string }> = await redisClient.json.get(quizzName, { path: '.quizzs' });
 
+    console.log('sendQuizzMessage')
+
     const question = quizzs[Math.floor(Math.random() * quizzs.length)];
 
     let options: Options = {};
@@ -123,3 +125,11 @@ async function createQuizEmbed(title: string, imageFileName?: string, attachment
 
 
 type Options = MessageCreateOptions;
+
+export type Player = {
+    score: number,
+    response_times: number[],
+    user_id: string,
+    user_name: string
+    mean_response_time: number | null
+}
