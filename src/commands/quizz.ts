@@ -178,6 +178,7 @@ export = {
                 });
             }
 
+            console.log(options)
             const rowSelectQuizz: ActionRowBuilder<any> = new ActionRowBuilder()
                 .addComponents(
                     new StringSelectMenuBuilder()
@@ -186,18 +187,21 @@ export = {
                         .addOptions(options),
                 );
 
+            console.log(rowSelectQuizz)
             const embed: EmbedBuilder = new EmbedBuilder()
-                .setColor('#FD5E53')
+                .setColor("#FD5E53")
                 .setTitle('Which quizz do you want to play ?');
 
+            console.log(embed)
             const gameId: string = `${interaction.user.id}:${Date.now()}`;
             const ownerId: string = interaction.user.id;
             const joinId = `multiplayerjoin-${ownerId}`;
             const startId = `multiplayerstart-${ownerId}`;
 
             // SEND QUIZZ SELECTION AND WAIT FOR RESPONSE
+            console.log('interaction.reply')
             let response = await interaction.reply({ embeds: [embed], components: [rowSelectQuizz] })
-
+            console.log(response)
             const filter = (i: any) => (i.user.id === ownerId);
             const collector = response.createMessageComponentCollector({ filter, time: 6000, max: 1 })
 
@@ -213,9 +217,9 @@ export = {
                 })
 
                 const joinButton = new ButtonBuilder()
-                .setCustomId(joinId)
-                .setLabel('Join party')
-                .setStyle(ButtonStyle.Primary)
+                    .setCustomId(joinId)
+                    .setLabel('Join party')
+                    .setStyle(ButtonStyle.Primary);
 
                 const startButton = new ButtonBuilder()
                     .setCustomId(startId)
