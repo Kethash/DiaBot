@@ -1,4 +1,4 @@
-import { Events, Message, MessageType, TextChannel } from "discord.js";
+import { EmbedBuilder, Events, Message, MessageType, TextChannel, userMention } from "discord.js";
 import { compareAnswers } from "../functions/answer-parsing";
 import {sendQuizzMessage, replyQuizzAnswer, Player} from "../functions/quizz";
 import config from "../../config.json"
@@ -33,7 +33,7 @@ export = {
             let quizzCreatedAt = new Date(answer.message_created_at);
             let replyCreatedAt = message.createdAt;
             console.log("createdAt", quizzCreatedAt, replyCreatedAt)
-            let responseTimeInSecond = (replyCreatedAt.getTime() - quizzCreatedAt.getTime()) / 1000;
+            const responseTimeInSecond = (replyCreatedAt.getTime() - quizzCreatedAt.getTime()) / 1000;
             game.players[message.author.id].response_times.push(responseTimeInSecond);
 
             await redisClient.json.set(`quizz:multiplayer:lobby:${answer.gameId}`, '.', game);
@@ -55,7 +55,6 @@ export = {
 
         // Multiplayer : End game message
         if(game && game.actualQuizzCount === game.quizzEndCounter){
-            console.log(game.players)
             let winners: Player[] = Object.values(game.players);
 
             winners = winners.sort((player1: Player, player2: Player) => {
@@ -70,7 +69,6 @@ export = {
                 }
                 return 0;
             });
-            console.log(winners)
 
             winners = winners.map((player) =>{
                 let meanResponseTime = player.response_times.reduce<number>((accumulator, currentValue) => accumulator + currentValue, 0);
@@ -78,22 +76,33 @@ export = {
                     return 0;
                 }
                 player.mean_response_time = meanResponseTime / player.response_times.length;
-                console.log(player.mean_response_time)
+
                 return player;
             }) as Player[];
 
-            let description = "Congrats to the winner of the party " + "<@" + winners[0].user_id + "> ! <:kanatablade:983426928109318206> \n " +
-                "Scores <:SetsunaFire:809221805985497138> \n";
-            description = winners.reduce<string>(
-                (accumulator, currentValue, index) =>
-                    accumulator + "# " + index + " : <@" + winners[index].user_id + "> : " + winners[index].score + " points, "
-                    + winners[index].mean_response_time,
-                ""
+            const description: string = "<:SetsunaFire:809221805985497138> Congrats to the winner of the party " + userMention(winners[0].user_id) + " ! <:kanatablade:983426928109318206>";
+
+            // const scores: string = winners.reduce<string>(
+            //     (accumulator, currentValue, index) =>
+            //         accumulator + "# " + index + " : <@" + winners[index].user_id + "> : " + winners[index].score + " points, "
+            //         + winners[index].mean_response_time,
+            //     ""
+            // );
+
+            const scores_embed: EmbedBuilder = new EmbedBuilder()
+                .setColor('#F23B4C')
+                .setTitle("Scores")
+                .setDescription(description)
+
+            winners.forEach((p: Player, index: number) =>
+                scores_embed.addFields({
+                    name: `# ${index}`,
+                    value: `${userMention(p.user_id)}\n${p.score} points\nMean response time: ${p.mean_response_time?.toFixed(3)}s`,
+                    inline: false
+                })
             );
 
-            console.log(description)
-
-            message.reply(description);
+            message.reply({content: `${description}`, embeds: [scores_embed]});
 
             return;
         }

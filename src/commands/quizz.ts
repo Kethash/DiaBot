@@ -1,4 +1,4 @@
-import { ActionRowBuilder, Attachment, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageComponentInteraction, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, Attachment, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageComponentInteraction, SlashCommandBuilder, StringSelectMenuBuilder, userMention } from 'discord.js';
 import axios from 'axios';
 import { isValidQuizz } from '../functions/quizz';
 import { createJoinLobbyMessageCollector, createStartGameMessageCollector } from '../functions/lobbyManager';
@@ -29,6 +29,11 @@ export = {
         ).addSubcommand(subcommand =>
             subcommand.setName('multiplayer')
                 .setDescription("Play a multiplayer quizz")
+                .addNumberOption(option =>
+                    option.setName('questions')
+                    .setDescription("How many questions ? (Default: 20)")
+                    .setRequired(false)
+                )
         ),
 
 
@@ -66,10 +71,10 @@ export = {
 
 
             const name: string = json.name.toLowerCase().split(' ').join('-');
-            redisClient.json.set(`quizz:${name}`, '.', json);
+            redisClient.json.set(`quizz:json:${name}`, '.', json);
             await interaction.reply({ content: "Quizz imported", ephemeral: true });
         } else if (optionChoice == 'play') {
-            const quizzs = await redisClient.KEYS('quizz:*');
+            const quizzs = await redisClient.KEYS('quizz:json:*');
             if (quizzs.length == 0 || quizzs == null) {
                 await interaction.reply({ content: 'There is no quizz' });
                 return;
@@ -102,7 +107,7 @@ export = {
             let playerId = interaction.user.id;
             const playerStats = await redisClient.json.get(`answer:player:${playerId}`, '.');
             if (playerStats == null) {
-                interaction.reply({
+                await interaction.reply({
                     embeds: [
                         new EmbedBuilder()
                             .setColor("#FD5E53")
@@ -129,7 +134,7 @@ export = {
 
             await interaction.reply({ embeds: [embed] });
         } else if (optionChoice == 'delete') {
-            const quizzs = await redisClient.KEYS('quizz:*');
+            const quizzs = await redisClient.KEYS('quizz:json:*');
             if (quizzs.length == 0 || quizzs == null) {
                 await interaction.reply({ content: 'There is no quizz' });
                 return;
@@ -159,9 +164,11 @@ export = {
             await interaction.reply({ embeds: [embed], components: [row] });
         } else if (optionChoice === 'multiplayer') {
             // QUIZZ SELECTION
-            const quizzs = await redisClient.KEYS('quizz:*');
+            const quizzs = await redisClient.KEYS('quizz:json:*');
+            const nb_questions: number = interaction.options.getNumber('questions') ? (interaction.options.get('questions')?.value as number) : 20;
+
             if (quizzs.length == 0 || quizzs == null) {
-                await interaction.followUp({ content: 'There is no quizz available :/' });
+                await interaction.reply({ content: 'There is no quizz available :/' });
                 return;
             };
             const options = [];
@@ -188,10 +195,8 @@ export = {
 
             const gameId: string = `${interaction.user.id}:${Date.now()}`;
             const ownerId: string = interaction.user.id;
-            const joinId = `multiplayerjoin-${ownerId}`;
-            const startId = `multiplayerstart-${ownerId}`;
 
-            let response = await interaction.reply({ embeds: [embed], components: [rowSelectQuizz] })
+            const response = await interaction.reply({ embeds: [embed], components: [rowSelectQuizz], ephemeral: true })
             // console.log(response)
             const filter = (i: any) => (i.user.id === ownerId);
             const collector = response.createMessageComponentCollector({ filter, time: 6000, max: 1 })
@@ -201,12 +206,15 @@ export = {
                 const quizzId = i.values[0];
                 await redisClient.json.set(`quizz:multiplayer:lobby:${gameId}`,'.', {
                     guildId: interaction.guildId,
-                    quizzEndCounter: 20,
+                    quizzEndCounter: nb_questions,
                     quizzId: quizzId,
                     players: {},
                     actualQuizzCount: 0,
                 })
-
+                
+                // Button Id
+                const joinId = `multiplayerjoin-${ownerId}`;
+                const startId = `multiplayerstart-${ownerId}`;
                 const joinButton = new ButtonBuilder()
                     .setCustomId(joinId)
                     .setLabel('Join party')
@@ -220,12 +228,18 @@ export = {
                 const row: ActionRowBuilder<any> = new ActionRowBuilder()
                     .addComponents(joinButton, startButton);
 
-                const messageLobby: string = `${interaction.user.toString()} started a multiplayer lobby !`;
+                const messageLobby: string = `${interaction.user.tag} started a multiplayer lobby !\n${nb_questions} questions`;
+                const descriptionLobby: string = `0 players joined`
 
-                createStartGameMessageCollector(redisClient, i, quizzId ,startId, ownerId, gameId);
-                createJoinLobbyMessageCollector(redisClient, i, joinId, gameId);
+                const lobbyEmbed: EmbedBuilder = new EmbedBuilder()
+                    .setTitle(messageLobby)
+                    .setDescription(descriptionLobby)
+                    .setColor('#F23B4C')
 
-                await i.reply({ content: messageLobby, components: [row] });
+                await createStartGameMessageCollector(redisClient, i, quizzId ,startId, ownerId, gameId);
+                await createJoinLobbyMessageCollector(redisClient, i, joinId, gameId, lobbyEmbed);
+
+                await i.reply({ embeds: [lobbyEmbed], components: [row] });
             });
 
 
