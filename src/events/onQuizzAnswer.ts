@@ -21,25 +21,25 @@ export = {
         let game = null;
 
         // Multiplayer : Player score Update
-        if(answer.game_id){
-            game = await redisClient.json.get(`quizz:multiplayer:lobby:${answer.game_id}`);
-
+        if(answer.gameId){
+            game = await redisClient.json.get(`quizz:multiplayer:lobby:${answer.gameId}`, '.');
             if(game.actualQuizzCount >= game.quizzEndCounter || !game.players[message.author.id]){
                 return;
             }
 
             game.actualQuizzCount++;
-            game.players[message.author.id].score++;
-            let quizzCreatedAt = new Date(game.players[message.author.id].message_created_at);
+            if (await replyQuizzAnswer(successToAnswer, answer, message)) game.players[message.author.id].score++;
+            // let quizzCreatedAt = new Date(game.players[message.author.id].message_created_at);
+            let quizzCreatedAt = new Date(answer.message_created_at);
             let replyCreatedAt = message.createdAt;
             console.log("createdAt", quizzCreatedAt, replyCreatedAt)
             let responseTimeInSecond = (replyCreatedAt.getTime() - quizzCreatedAt.getTime()) / 1000;
             game.players[message.author.id].response_times.push(responseTimeInSecond);
 
-            await redisClient.json.set(`quizz:multiplayer:lobby:${answer.game_id}`, game);
+            await redisClient.json.set(`quizz:multiplayer:lobby:${answer.gameId}`, '.', game);
+        } else {
+            await replyQuizzAnswer(successToAnswer, answer, message);
         }
-
-        await replyQuizzAnswer(successToAnswer, answer, message);
 
         // Suppression clef
         await redisClient.json.del(`answer:${message.reference?.messageId}`, '.');
@@ -102,6 +102,6 @@ export = {
         const channel: TextChannel = message.channel as TextChannel;
         const userId = message.author.id;
 
-        await sendQuizzMessage(quizzName, userId, channel, redisClient, answer.game_id);
+        await sendQuizzMessage(quizzName, userId, channel, redisClient, answer.gameId);
     }
 }

@@ -72,12 +72,18 @@ export async function sendQuizzMessage(quizzName: string, userId: string, channe
     });
 }
 
-export async function replyQuizzAnswer(successToAnswer: boolean, answer: any, message: Message | PartialMessage): Promise<void> {
+export async function replyQuizzAnswer(successToAnswer: boolean, answer: any, message: Message | PartialMessage): Promise<boolean> {
     const yesEmote = yesEmotes[Math.floor(Math.random() * yesEmotes.length)];
     const noEmote = noEmotes[Math.floor(Math.random() * noEmotes.length)];
 
-    if (successToAnswer) message.reply(`${yesEmote} Correct ! ❤ ${yesEmote}`)
-    else await message.reply(`${noEmote} BUU BUU DESUWA ! ${noEmote}\n Corrects answers were : \n - ${answer.answers.replaceAll(';', '\n - ')} `)
+    if (successToAnswer) {
+        await message.reply(`${yesEmote} Correct ! ❤ ${yesEmote}`);
+        return true;
+    }
+    else {
+        await message.reply(`${noEmote} BUU BUU DESUWA ! ${noEmote}\n Corrects answers were : \n - ${answer.answers.replaceAll(';', '\n - ')} `);
+        return false;
+    }
 }
 
 export function isValidQuizz(jsonQuizz: jsonquizz): boolean {

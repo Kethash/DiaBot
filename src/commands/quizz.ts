@@ -43,8 +43,6 @@ export = {
 
         const optionChoice: string = interaction.options.getSubcommand();
 
-        console.log(optionChoice)
-
         if (optionChoice == 'import') {
 
             const attachment = interaction.options.getAttachment('file') as Attachment;
@@ -124,7 +122,6 @@ export = {
                 return previousValue === '' ? currentValue : previousValue + '\n'
             }, '');
 
-            console.log(description)
             const embed: EmbedBuilder = new EmbedBuilder()
                 .setColor("#FD5E53")
                 .setTitle(`${player.username} stats`)
@@ -161,11 +158,10 @@ export = {
 
             await interaction.reply({ embeds: [embed], components: [row] });
         } else if (optionChoice === 'multiplayer') {
-            console.log('multiplayer')
             // QUIZZ SELECTION
             const quizzs = await redisClient.KEYS('quizz:*');
             if (quizzs.length == 0 || quizzs == null) {
-                await interaction.reply({ content: 'There is no quizz available :/' });
+                await interaction.followUp({ content: 'There is no quizz available :/' });
                 return;
             };
             const options = [];
@@ -178,30 +174,25 @@ export = {
                 });
             }
 
-            console.log(options)
             const rowSelectQuizz: ActionRowBuilder<any> = new ActionRowBuilder()
                 .addComponents(
                     new StringSelectMenuBuilder()
-                        .setCustomId('selectquiz')
+                        .setCustomId('selectquizmultiplayer')
                         .setPlaceholder('Select a quizz')
                         .addOptions(options),
                 );
 
-            console.log(rowSelectQuizz)
             const embed: EmbedBuilder = new EmbedBuilder()
                 .setColor("#FD5E53")
                 .setTitle('Which quizz do you want to play ?');
 
-            console.log(embed)
             const gameId: string = `${interaction.user.id}:${Date.now()}`;
             const ownerId: string = interaction.user.id;
             const joinId = `multiplayerjoin-${ownerId}`;
             const startId = `multiplayerstart-${ownerId}`;
 
-            // SEND QUIZZ SELECTION AND WAIT FOR RESPONSE
-            console.log('interaction.reply')
             let response = await interaction.reply({ embeds: [embed], components: [rowSelectQuizz] })
-            console.log(response)
+            // console.log(response)
             const filter = (i: any) => (i.user.id === ownerId);
             const collector = response.createMessageComponentCollector({ filter, time: 6000, max: 1 })
 
@@ -231,10 +222,10 @@ export = {
 
                 const messageLobby: string = `${interaction.user.toString()} started a multiplayer lobby !`;
 
-                createStartGameMessageCollector(redisClient, interaction, quizzId ,startId, ownerId, gameId);
-                createJoinLobbyMessageCollector(redisClient, interaction, joinId, gameId);
+                createStartGameMessageCollector(redisClient, i, quizzId ,startId, ownerId, gameId);
+                createJoinLobbyMessageCollector(redisClient, i, joinId, gameId);
 
-                await interaction.reply({ content: messageLobby, components: [row] });
+                await i.reply({ content: messageLobby, components: [row] });
             });
 
 
