@@ -52,4 +52,5 @@ ___
 ### About
 
 Contributors: [TomBerriot](https://github.com/Kethash/DiaBot/pulls?q=is%3Apr+author%3ATomBerriot)
+
 Created by the server: [Love Live! Francophone](https://discord.gg/Q76jxRcfAJ)
