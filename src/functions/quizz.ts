@@ -1,5 +1,5 @@
 import axios from "axios";
-import {AttachmentBuilder, EmbedBuilder, Message, MessageCreateOptions, PartialMessage, TextChannel} from "discord.js";
+import {AttachmentBuilder, EmbedBuilder, Message, MessageCreateOptions, PartialMessage, StageChannel, TextBasedChannel, TextChannel} from "discord.js";
 import sharp from "sharp";
 
 let noEmotes = [
@@ -26,7 +26,7 @@ let yesEmotes = [
     '<:eliapprove:964271606379724943>'
 ];
 
-export async function sendQuizzMessage(quizzName: string, userId: string, channel: TextChannel, redisClient: any, gameId: string | null ): Promise<void> {
+export async function sendQuizzMessage(quizzName: string, userId: string, channel: Exclude<TextBasedChannel, StageChannel>, redisClient: any, gameId: string | null ): Promise<void> {
     const quizzs: Array<{ title: string, imageLink: string, blurImage: boolean, blurRate: number, answers: string }> = await redisClient.json.get(quizzName, { path: '.quizzs' });
 
     const question = quizzs[Math.floor(Math.random() * quizzs.length)];

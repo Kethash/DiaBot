@@ -1,7 +1,7 @@
-import { ActionRowBuilder, Attachment, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageComponentInteraction, SlashCommandBuilder, StringSelectMenuBuilder, userMention } from 'discord.js';
+import { ActionRowBuilder, Attachment, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
 import axios from 'axios';
 import { isValidQuizz } from '../functions/quizz';
-import { createJoinLobbyMessageCollector, createStartGameMessageCollector } from '../functions/lobbyManager';
+import { createMultiplayerGame } from '../functions/lobbyManager';
 
 export = {
     data: new SlashCommandBuilder()
@@ -236,8 +236,7 @@ export = {
                     .setDescription(descriptionLobby)
                     .setColor('#F23B4C')
 
-                await createStartGameMessageCollector(redisClient, i, quizzId ,startId, ownerId, gameId);
-                await createJoinLobbyMessageCollector(redisClient, i, joinId, gameId, lobbyEmbed);
+                await createMultiplayerGame(redisClient, i, quizzId, joinId, startId, ownerId, gameId, lobbyEmbed);
 
                 await i.reply({ embeds: [lobbyEmbed], components: [row] });
             });

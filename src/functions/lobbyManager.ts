@@ -1,29 +1,12 @@
-import { ChatInputCommandInteraction, ComponentType, EmbedBuilder, MessageComponentInteraction, TextChannel, channelLink } from "discord.js";
+import { ButtonInteraction, CacheType, ChatInputCommandInteraction, ComponentType, EmbedBuilder, MessageComponentInteraction, StageChannel, TextBasedChannel } from "discord.js";
 import { sendQuizzMessage} from "./quizz";
 
-export async function createStartGameMessageCollector(redisClient: any, interaction: ChatInputCommandInteraction,quizzId: string ,startButtonCustomId: string, ownerId: string, gameId: string) {
+export async function createMultiplayerGame(redisClient: any, interaction: ChatInputCommandInteraction,quizzId: string , joinButtonCustomId: string, startButtonCustomId: string, ownerId: string, gameId: string, lobbyEmbed: EmbedBuilder) {
+    // Collector for the join button
+    const joinfilter = (i: MessageComponentInteraction) => i.customId === joinButtonCustomId;
+    const joinCollector = (interaction.channel as Exclude<TextBasedChannel, StageChannel>).createMessageComponentCollector({ filter: joinfilter, componentType: ComponentType.Button, time: 300000 });
 
-    const filter = (i: MessageComponentInteraction) => (i.customId === startButtonCustomId) && (startButtonCustomId.endsWith(ownerId) && (i.user.id === ownerId));
-    const collector = interaction.channel!.createMessageComponentCollector({ filter, componentType: ComponentType.Button, time: 300000 });
-
-    collector.on('collect', async i => {
-        const nb_players = Object.values((await redisClient.json.get(`quizz:multiplayer:lobby:${gameId}`, '.')).players).length;
-        if (nb_players === 0)
-        {
-            await i.reply({content: "You cannot start a game without any players !",ephemeral: true})
-        } else {
-            await interaction.editReply({ content: 'Fight !', components: [], embeds: [] });
-            await sendQuizzMessage(quizzId , ownerId, interaction.channel as TextChannel, redisClient, gameId)
-        }
-    });
-}
-
-export async function createJoinLobbyMessageCollector(redisClient: any, interaction: ChatInputCommandInteraction, joinButtonCustomId: string, gameId: string, lobbyEmbed: EmbedBuilder) {
-
-    const filter = (i: MessageComponentInteraction) => i.customId === joinButtonCustomId;
-    const collector = interaction.channel!.createMessageComponentCollector({ filter, componentType: ComponentType.Button, time: 300000 });
-
-    collector.on('collect', async i => {
+    joinCollector.on('collect', async (i: ButtonInteraction<CacheType>) => {
 
         await redisClient.json.set(`quizz:multiplayer:lobby:${gameId}`, `.players.${i.user.id}`, {
             score: 0,
@@ -40,6 +23,26 @@ export async function createJoinLobbyMessageCollector(redisClient: any, interact
         await interaction.editReply({embeds: [lobbyEmbed]});
         await i.reply({embeds: [joinEmbed]})
     })
+    
+    // Collector for the start button
+    const startfilter = (i: MessageComponentInteraction) => (i.customId === startButtonCustomId);
+    const startButtoncollector = (interaction.channel as Exclude<TextBasedChannel, StageChannel>).createMessageComponentCollector({ filter: startfilter, componentType: ComponentType.Button, time: 300000 });
 
-    collector.on('end', () => console.log('Le join est fini'))
+    startButtoncollector.on('collect', async (i: ButtonInteraction<CacheType>) => {
+        const nb_players = Object.values((await redisClient.json.get(`quizz:multiplayer:lobby:${gameId}`, '.')).players).length;
+        if (!startButtonCustomId.endsWith(i.user.id)) {
+            await i.reply({
+                content: "Only the host of the game can start !",
+                ephemeral: true
+            });
+        } else if (nb_players === 0) {
+            await i.reply({content: "You cannot start a game without any players !",ephemeral: true})
+        } else {
+            joinCollector.stop(); // Stops the join button from collecting new requests
+            startButtoncollector.stop(); // Removes the collector of the start button
+            await interaction.editReply({ content: 'Fight !', components: [], embeds: [] });
+            await sendQuizzMessage(quizzId , ownerId, interaction.channel as Exclude<TextBasedChannel, StageChannel>, redisClient, gameId)
+        }
+    });
+
 }
