@@ -13,13 +13,17 @@ export = {
         let answer = await redisClient.json.get(`answer:${messageReaction.message.id}`, '.');
         if (answer == null) return; // Prevent from multiple responses when players play together
 
+        if(answer.gameId){
+            return;
+        }
+
         // Suppression clef
         await redisClient.json.del(`answer:${messageReaction.message.id}`, '.');
 
         const channel: TextChannel = messageReaction.message.channel as TextChannel;
 
         await replyQuizzAnswer(false, answer, messageReaction.message);
-        await sendQuizzMessage(answer.quizz_id, answer.author_id, channel, redisClient);
+        await sendQuizzMessage(answer.quizz_id, answer.author_id, channel, redisClient, null);
 
         //await messageReaction.remove();
     }

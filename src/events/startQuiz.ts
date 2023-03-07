@@ -13,7 +13,7 @@ export = {
 
         await interaction.reply("Quizz is starting !");
 
-        await sendQuizzMessage(quizzName, userId, channel, redisClient);
+        await sendQuizzMessage(quizzName, userId, channel, redisClient, null);
 
         // Launch
 
