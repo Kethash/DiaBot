@@ -230,11 +230,13 @@ export = {
 
                 const messageLobby: string = `${interaction.user.tag} started a multiplayer lobby !\n${nb_questions} questions`;
                 const descriptionLobby: string = `0 players joined`
+                const quizzName = await redisClient.json.get(quizzId, { path: 'name'})
 
                 const lobbyEmbed: EmbedBuilder = new EmbedBuilder()
                     .setTitle(messageLobby)
                     .setDescription(descriptionLobby)
                     .setColor('#F23B4C')
+                    .addFields({name: "Quizz", value: quizzName})
 
                 await createMultiplayerGame(redisClient, i, quizzId, joinId, startId, ownerId, gameId, lobbyEmbed);
 
