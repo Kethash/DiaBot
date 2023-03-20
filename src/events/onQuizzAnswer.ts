@@ -93,7 +93,7 @@ export = {
 
             winners.forEach((p: Player, index: number) =>
                 scores_embed.addFields({
-                    name: `# ${index}`,
+                    name: `# ${index+1}`,
                     value: `${userMention(p.user_id)}\n${p.score} points\nMean response time: ${p.mean_response_time?.toFixed(3)}s`,
                     inline: false
                 })

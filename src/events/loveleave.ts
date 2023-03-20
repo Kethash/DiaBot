@@ -29,7 +29,9 @@ export = {
         .setTitle(leaveMessages.title)
         .setAuthor({name: `${member.user.tag}`, iconURL: `${member.user.avatarURL()}`})
         .setDescription(leaveMessages.description)
-        .setColor("#FD5E53");
+        .setColor("#FD5E53")
+        .setImage("https://media.tenor.com/6oCaYr-1QFsAAAAC/love-live.gif");
+
         channel.send({embeds: [goodbyembed]});
     }
 }
