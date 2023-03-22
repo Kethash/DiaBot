@@ -237,6 +237,7 @@ export = {
                     .setDescription(descriptionLobby)
                     .setColor('#F23B4C')
                     .addFields({name: "Quizz", value: quizzName})
+                    .setFooter({text: "You have 5 minutes to proceed or the lobby will time out !"});
 
                 await createMultiplayerGame(redisClient, i, quizzId, joinId, startId, ownerId, gameId, lobbyEmbed);
 

@@ -1,6 +1,12 @@
 import { ButtonInteraction, CacheType, ChatInputCommandInteraction, ComponentType, EmbedBuilder, MessageComponentInteraction, StageChannel, TextBasedChannel } from "discord.js";
 import { sendQuizzMessage} from "./quizz";
 
+const timeoutEmbed: EmbedBuilder = new EmbedBuilder()
+                                    .setColor('#F23B4C')
+                                    .setTitle('Lobby timed out')
+                                    .setDescription('Please recreate one');
+
+
 export async function createMultiplayerGame(redisClient: any, interaction: ChatInputCommandInteraction,quizzId: string , joinButtonCustomId: string, startButtonCustomId: string, ownerId: string, gameId: string, lobbyEmbed: EmbedBuilder) {
     // Collector for the join button
     const joinfilter = (i: MessageComponentInteraction) => i.customId === joinButtonCustomId;
@@ -23,6 +29,13 @@ export async function createMultiplayerGame(redisClient: any, interaction: ChatI
         await interaction.editReply({embeds: [lobbyEmbed]});
         await i.reply({embeds: [joinEmbed]})
     })
+
+    joinCollector.on('end', async (_collected, reason) => {
+        if (reason === 'time') {
+            await redisClient.json.del(`quizz:multiplayer:lobby:${gameId}`); // deletes the game's key
+            interaction.editReply({embeds: [timeoutEmbed], components: []});
+        }
+    })
     
     // Collector for the start button
     const startfilter = (i: MessageComponentInteraction) => (i.customId === startButtonCustomId);
@@ -38,8 +51,8 @@ export async function createMultiplayerGame(redisClient: any, interaction: ChatI
         } else if (nb_players === 0) {
             await i.reply({content: "You cannot start a game without any players !",ephemeral: true})
         } else {
-            joinCollector.stop(); // Stops the join button from collecting new requests
-            startButtoncollector.stop(); // Removes the collector of the start button
+            joinCollector.stop('game started'); // Stops the join button from collecting new requests
+            startButtoncollector.stop('game started'); // Removes the collector of the start button
             await interaction.editReply({ content: 'Fight !', components: [], embeds: [] });
             await sendQuizzMessage(quizzId , ownerId, interaction.channel as Exclude<TextBasedChannel, StageChannel>, redisClient, gameId)
         }
