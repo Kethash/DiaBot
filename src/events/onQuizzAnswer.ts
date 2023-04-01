@@ -29,6 +29,7 @@ export = {
 
             game.actualQuizzCount++;
             if (await replyQuizzAnswer(successToAnswer, answer, message)) game.players[message.author.id].score++;
+            else game.players[message.author.id].score--;
             // let quizzCreatedAt = new Date(game.players[message.author.id].message_created_at);
             let quizzCreatedAt = new Date(answer.message_created_at);
             let replyCreatedAt = message.createdAt;
