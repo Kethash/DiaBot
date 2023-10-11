@@ -34,30 +34,25 @@ export async function sendQuizzMessage(quizzName: string, userId: string, channe
     let options: Options = {};
 
     if (question.imageLink) {
-        try {
-            const imageResponse = await axios.get(question.imageLink, { responseType: 'arraybuffer' });
-            let buffer = (imageResponse).data as Buffer;
+        const imageResponse = await axios.get(question.imageLink, { responseType: 'arraybuffer' });
+        let buffer = (imageResponse).data as Buffer;
 
-            if (question?.blurImage === true) buffer = await sharp(buffer).blur(question.blurRate).toBuffer();
+        if (question?.blurImage === true) buffer = await sharp(buffer).blur(question.blurRate).toBuffer();
 
-            const urlFileExtension = question.imageLink.substring(question.imageLink.lastIndexOf('.') + 1);
+        const urlFileExtension = question.imageLink.substring(question.imageLink.lastIndexOf('.') + 1);
 
-            const actualFileExtension = (urlFileExtension.length >= 3 && urlFileExtension.length <= 4) ?
-                urlFileExtension : imageResponse.headers['content-type']?.substring(imageResponse.headers['content-type'].lastIndexOf('/') + 1);
+        const actualFileExtension = (urlFileExtension.length >= 3 && urlFileExtension.length <= 4) ?
+            urlFileExtension : imageResponse.headers['content-type']?.substring(imageResponse.headers['content-type'].lastIndexOf('/') + 1);
 
-            const imageFileName = 'image.' + actualFileExtension;
+        const imageFileName = 'image.' + actualFileExtension;
 
-            const ImageAttachment = new AttachmentBuilder(buffer, { name: imageFileName });
+        const ImageAttachment = new AttachmentBuilder(buffer, { name: imageFileName });
 
-            options = await createQuizEmbed(
-                question?.title ?? "What is the title of this song ? Reply to this message to respond :)",
-                imageFileName,
-                ImageAttachment
-            );
-        } catch (e) {
-            // Temp fix to prevent Dia bot crashing.
-            options = await createQuizEmbed("Error getting quizz images, you should update your images links !");
-        }
+        options = await createQuizEmbed(
+            question?.title ?? "What is the title of this song ? Reply to this message to respond :)",
+            imageFileName,
+            ImageAttachment
+        );
     } else options = await createQuizEmbed(question?.title ?? "What is the title of this song ? Reply to this message to respond :)");
 
     const message = await channel.send(options);
