@@ -23,11 +23,11 @@ for (const file of commandFiles) {
 const rest = new REST({ version: '10' }).setToken(token);
 
 // GLOBAL
-rest.put(Routes.applicationCommands(clientID), { body: commands })
-	.then(() => console.log('Successfully registered application commands.'))
-	.catch(console.error);
+// rest.put(Routes.applicationCommands(clientID), { body: commands })
+// 	.then(() => console.log('Successfully registered application commands.'))
+// 	.catch(console.error);
 
 // FOR A SPECIFIC GUILD
-// rest.put(Routes.applicationGuildCommands(clientID, '768507412155334707'), { body: commands })
-// 	.then(() => console.log('Successfully registered application commands for guild'))
-// 	.catch((err) => console.error(err));
+rest.put(Routes.applicationGuildCommands(clientID, '768507412155334707'), { body: commands })
+	.then(() => console.log('Successfully registered application commands for guild'))
+	.catch((err) => console.error(err));
