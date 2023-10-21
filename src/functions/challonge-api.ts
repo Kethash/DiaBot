@@ -31,13 +31,13 @@ export async function addParticipants(url:string, participants: Array<{name: str
         .then((value: AxiosResponse) => true).catch(() => false);
 }
 
-export async function finishTournament(url: string): Promise<boolean> {
-    return await axios.post(`${CHALLONGE_BASE_URL}/${url}/finalize.json`)
+export async function finishTournament(url: string): Promise<boolean | Error> {
+    return await axios.post(`${CHALLONGE_BASE_URL}/${url}/finalize.json`, {api_key: API_KEY})
         .then((value: AxiosResponse) => {
             if (value.status === 200) return true;
-            throw Error;
-        }).catch(() => {
-            return false;
+            throw Error(value.data);
+        }).catch((err: Error) => {
+            return err;
     });
 }
 

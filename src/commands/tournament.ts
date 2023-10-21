@@ -1,7 +1,7 @@
 import { Exception } from "@sentry/node";
 import axios from "axios";
 import { ActionRowBuilder, Attachment, CacheType, ChatInputCommandInteraction, ComponentType, Embed, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
-import { addParticipants, createTournament, deleteTournament, getTournamentByUrl } from "../functions/challonge-api";
+import { addParticipants, createTournament, deleteTournament, finishTournament, getTournamentByUrl } from "../functions/challonge-api";
 import challonge_config from "../../challonge-config.json";
 
 export = {
@@ -140,18 +140,27 @@ export = {
                 break;
 
             case 'finish':
-                const tournamentsInServer: [] = await redisClient.KEYS(`tournament:*`)
-                    .map((e: string) => {
-                            return e.split(':')[-1];
-                        }
-                    );
+                let tournamentsInServer: string[] = await redisClient.KEYS(`tournament:*`);
+                tournamentsInServer = tournamentsInServer.map((e:string) => e.split(':')[1]);
+                const tournamentsInServerMenu: Array<{label: string, description: string, value: string}> = [];
                 
+                for (const tournament of tournamentsInServer) {
+                    const thatTournament: string = await getTournamentByUrl(tournament);
+                    console.debug(tournament, thatTournament);
+
+                    tournamentsInServerMenu.push({
+                        label: thatTournament,
+                        description: "Tournament",
+                        value: tournament
+                    });
+                }
+
                 const removeTournamentRow: ActionRowBuilder<any> = new ActionRowBuilder()
                     .addComponents(
                         new StringSelectMenuBuilder()
                             .setCustomId('removetournament')
                             .setPlaceholder('Please select a tournament')
-                            .addOptions(tournamentsInServer),
+                            .addOptions(tournamentsInServerMenu),
                     );
 
                 const finishTournamentEmbed: EmbedBuilder = new EmbedBuilder()
@@ -167,11 +176,15 @@ export = {
                 finishCollector.on('collect', async i => {
                     const selection = i.values[0];
                     try {
+                        const finishResponse = await finishTournament(selection);
+                        if (finishResponse instanceof Error) throw Error(finishResponse.message);
                         await redisClient.DEL(`tournament:${selection}`);
                     } catch (err) {
                         console.error(err);
+                        await i.reply({content: "Sorry, an error occured !",ephemeral: true});
+                        return;
                     } finally {
-                        await i.reply({content: "The tournament is over !",ephemeral: true})
+                        await i.reply({content: "The tournament is over !",ephemeral: true});
                     }
                 });
                 break;
