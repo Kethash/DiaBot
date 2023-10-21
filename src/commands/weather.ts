@@ -24,14 +24,10 @@ export = {
         await axios.get(BASE_URL, { params: params }).then(async (response: AxiosResponse) => {
             if(response.status != 200) throw Error;
 
-            console.debug("Ouais !");
-
             const body = response.data;
             const location = body["location"];
             const current = body["current"];
             const air_quality = body["current"]["air_quality"];
-
-            console.debug("Ouais 2");
 
             const embed: EmbedBuilder = new EmbedBuilder()
                 .setColor("#FD5E53")
@@ -48,8 +44,6 @@ export = {
                     { name: "Humidity", value: `${current["humidity"]}`, inline: true },
                     { name: "Cloud", value: `${current["cloud"]}`},
                 );
-
-            console.debug("Ouais 3");
 
             await interaction.reply({ embeds: [embed] });
 
