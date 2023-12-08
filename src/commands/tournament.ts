@@ -1,7 +1,7 @@
 import { Exception } from "@sentry/node";
 import axios from "axios";
 import { ActionRowBuilder, Attachment, CacheType, ChatInputCommandInteraction, ComponentType, Embed, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
-import { addParticipants, createTournament, deleteTournament, finishTournament, getTournamentByUrl } from "../functions/challonge-api";
+import { addParticipants, createTournament, deleteTournament, finishTournament, getTournamentByUrl, showTournamentInfo } from "../functions/challonge-api";
 import challonge_config from "../../challonge-config.json";
 
 export = {
@@ -37,6 +37,11 @@ export = {
                 .setDescription('Show current tournaments')
                 )
             .addSubcommand(subcommand =>
+                subcommand.setName('info')
+                .setDescription('Get an info from a tournament')
+
+            )
+            .addSubcommand(subcommand =>
                 subcommand.setName('finish')
                 .setDescription("Finishes a tournament")
                 )
@@ -58,9 +63,27 @@ export = {
             return;
         }
 
-
         const optionChoice: string = interaction.options.getSubcommand();
         const serverName: string = (interaction.guild?.name as string);
+        const tournamentUrl: string = interaction.options.getString("url") as string;
+
+        /*
+        *
+        * All the const variables
+        * tournamentKeys: Get all tournaments from REDIS
+        * tournaments: an array of all the tournaments got
+        */
+
+        const tournamentKeys = await redisClient.KEYS(`tournament:*`);
+        const tournaments: Array<{
+            name: string,
+            value: string
+        }> = [];
+
+        /*
+        * END OF CONST VARS
+        */
+
 
         switch (optionChoice) {
             case 'create':
@@ -112,16 +135,40 @@ export = {
                 });
                 break;
 
-            case 'show':
-                const tournamentKeys = await redisClient.KEYS(`tournament:*`);
+            case 'info':
                 if (tournamentKeys.length === 0 || tournamentKeys == null) {
                     await interaction.reply({ content: 'There is no current tournament' });
                     return;
                 }
-                const tournaments: Array<{
-                    name: string,
-                    value: string
-                }> = [];
+                
+                const participants: Array<any> | string = await showTournamentInfo(tournamentUrl);
+                if (typeof participants === "string") {
+                    await interaction.reply({content: `${participants}`});
+                } else {
+                    const participantsEmbed = []
+                    for (const participant of participants) {
+                        participantsEmbed.push({
+                            name: `Name: ${participant.name}`,
+                            value: `Seed: ${participant.seed}`
+                        });
+                    }
+
+                    const showparticipantsEmbed: EmbedBuilder = new EmbedBuilder()
+                        .setTitle("Toutnament info")
+                        .addFields(participantsEmbed)
+                        .setColor("#FD5E53")
+
+                    await interaction.reply({embeds: [showparticipantsEmbed], ephemeral: true});
+
+                }
+                
+                break;
+
+            case 'show':
+                if (tournamentKeys.length === 0 || tournamentKeys == null) {
+                    await interaction.reply({ content: 'There is no current tournament' });
+                    return;
+                }
 
                 for (const tournament of tournamentKeys) {
                     const [name, server, type]: [string, string, string] = await redisClient.json.get(tournament, {path: ['$["name", "server", "type"]'] })
@@ -190,7 +237,6 @@ export = {
                 break;
 
             case 'delete':
-                const tournamentUrl: string = interaction.options.getString("url") as string;
                 await redisClient.json.del(`tournament:${tournamentUrl}`);
                 const deleteResult: boolean = await deleteTournament(tournamentUrl);
 

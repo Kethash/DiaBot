@@ -60,3 +60,16 @@ export async function getTournamentByUrl(url: string): Promise<string> {
         });
 }
 
+export async function showTournamentInfo(url: string): Promise<Array<any> | string> {
+    return await axios.get(`${CHALLONGE_BASE_URL}/${url}.json?api_key=${API_KEY}&include_participants=1`)
+        .then((value: AxiosResponse) => {
+            if (value.status != 200) throw Error;
+            const participants: Array<Object> = value.data["tournament"]["participants"];
+            return participants;
+        })
+        .catch((err) => {
+            console.error(err)
+            return "Error, cannot return any player !"
+        });
+}
+
