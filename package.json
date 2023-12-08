@@ -18,7 +18,7 @@
     "@sentry/node": "^7.29.0",
     "@sentry/tracing": "^7.29.0",
     "axios": "^1.2.1",
-    "discord.js": "14.13.0",
+    "discord.js": "^14.12.1",
     "fuzzyset": "^1.0.7",
     "redis": "^4.2.0",
     "redis-om": "^0.3.6",
