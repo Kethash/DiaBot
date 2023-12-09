@@ -1,5 +1,5 @@
 import axios from "axios";
-import {AttachmentBuilder, EmbedBuilder, Message, MessageCreateOptions, PartialMessage, StageChannel, TextBasedChannel, TextChannel} from "discord.js";
+import {ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, MessageCreateOptions, PartialMessage, StageChannel, TextBasedChannel } from "discord.js";
 import sharp from "sharp";
 
 let noEmotes = [
@@ -52,18 +52,16 @@ export async function sendQuizzMessage(quizzName: string, userId: string, channe
             options = await createQuizEmbed(
                 question?.title ?? "What is the title of this song ? Reply to this message to respond :)",
                 imageFileName,
-                ImageAttachment
+                ImageAttachment,
+                gameId
             );
         } catch (e) {
             // Temp fix to prevent Dia bot crashing.
             options = await createQuizEmbed("Error getting quizz images, you should update your images links !");
         }
-    } else options = await createQuizEmbed(question?.title ?? "What is the title of this song ? Reply to this message to respond :)");
+    } else options = await createQuizEmbed(question?.title ?? "What is the title of this song ? Reply to this message to respond :)", undefined, undefined, gameId);
 
     const message = await channel.send(options);
-    if(!gameId){
-        message.react('⏭️');
-    }
 
     redisClient.json.set(`answer:${message.id}`, '.', {
         author_id: userId,
@@ -117,12 +115,24 @@ export function isValidQuizz(jsonQuizz: jsonquizz): boolean {
     }
 }
 
-async function createQuizEmbed(title: string, imageFileName?: string, attachment?: AttachmentBuilder): Promise<Options> {
+async function createQuizEmbed(title: string, imageFileName?: string, attachment?: AttachmentBuilder, gameId?: string | null ): Promise<Options> {
 
     const options: Options = {};
     const embed: EmbedBuilder = new EmbedBuilder()
         .setColor("#FD5E53")
         .setTitle(title)
+
+    if (!gameId) {
+        const skipButtonComponent = new ButtonBuilder()
+        .setCustomId('skip')
+        .setEmoji('⏭️')
+        .setStyle(ButtonStyle.Primary);
+
+        const row: any = new ActionRowBuilder()
+            .addComponents(skipButtonComponent);
+
+        options['components'] = [row];
+    }
 
     if (typeof attachment !== 'undefined' && typeof imageFileName !== 'undefined') {
         embed.setImage('attachment://' + imageFileName);
