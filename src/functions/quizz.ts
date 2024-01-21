@@ -128,7 +128,7 @@ async function createQuizEmbed(title: string, imageFileName?: string, attachment
         .setEmoji('⏭️')
         .setStyle(ButtonStyle.Primary);
 
-        const row: any = new ActionRowBuilder()
+        const row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(skipButtonComponent);
 
         options['components'] = [row];

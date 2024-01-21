@@ -1,6 +1,5 @@
 import { Events, TextChannel, Interaction , User, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { sendQuizzMessage, replyQuizzAnswer } from "../functions/quizz";
-import config from "../../config.json"
 
 export = {
     name: Events.InteractionCreate,

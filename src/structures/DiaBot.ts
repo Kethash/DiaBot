@@ -6,8 +6,8 @@ import * as Sentry from "@sentry/node";
 
 class DiaBot extends Client {
     private diatabaseUnits = {
-        'events': ['loveleave', 'startQuiz', 'onQuizzAnswer', 'removeQuiz', 'onQuizzSkip'],
-        'commands': ['setloveleavetime', 'setloveleavechannel', 'quizz', 'tournament']
+        'events': ['loveleave', 'startQuiz', 'onQuizzAnswer', 'removeQuiz', 'onQuizzSkip', 'onTournamentCreate'],
+        'commands': ['setloveleavetime', 'setloveleavechannel', 'quizz', 'tournamentc', 'tournament']
     }
 
     commands = new Collection()

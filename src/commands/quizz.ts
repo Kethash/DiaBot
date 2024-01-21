@@ -225,7 +225,7 @@ export = {
                     .setLabel('Start !')
                     .setStyle(ButtonStyle.Success)
 
-                const row: ActionRowBuilder<any> = new ActionRowBuilder()
+                const row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(joinButton, startButton);
 
                 const messageLobby: string = `${interaction.user.tag} started a multiplayer lobby !\n${nb_questions} questions`;
