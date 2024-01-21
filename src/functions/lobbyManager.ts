@@ -1,5 +1,5 @@
 import { ButtonInteraction, CacheType, ChatInputCommandInteraction, ComponentType, EmbedBuilder, MessageComponentInteraction, StageChannel, TextBasedChannel } from "discord.js";
-import { sendQuizzMessage} from "./quizz";
+import { sendQuizzMessage } from "./quizz";
 
 const timeoutEmbed: EmbedBuilder = new EmbedBuilder()
                                     .setColor('#F23B4C')
