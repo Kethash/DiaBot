@@ -1,4 +1,4 @@
-import { ActionRowBuilder, CacheType, ChatInputCommandInteraction, ComponentType, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, CacheType, ChatInputCommandInteraction, ComponentType, EmbedBuilder, PermissionsBitField, Role, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
 import challonge_config from "../../challonge-config.json";
 import { createTournamentParticipantsCollector, getAllTournaments } from "../functions/tournament";
 import { createClient } from "redis";
@@ -43,6 +43,7 @@ export = {
                 
                 await redisClient.json.set(createdTournamentKey, '.', {
                     name: tournamentName,
+                    host: interaction.user.username,
                     participants: []
                 });
 
@@ -66,12 +67,24 @@ export = {
             
             case 'delete':
                 const deleteOptions = [];
-                for (const option of await getAllTournaments(redisClient, serverName)) {
-                    deleteOptions.push({
-                        label: option[0].name,
-                        value: option[1]
-                    });
+
+                if (interaction.memberPermissions?.has("Administrator")) {
+                    for (const option of await getAllTournaments(redisClient, serverName)) {
+                        deleteOptions.push({
+                            label: option[0].name,
+                            value: option[1]
+                        });
+                    }
+                } else {
+                    for (const option of await getAllTournaments(redisClient, serverName, interaction.user.username)) {
+                        deleteOptions.push({
+                            label: option[0].name,
+                            value: option[1]
+                        });
+                    }
                 }
+
+                if (deleteOptions.length === 0) return interaction.reply({ content: "There is no tournament.", ephemeral: true})
 
                 const deleteStringSelectMenu =  new StringSelectMenuBuilder()
                         .setCustomId(`removetournament-${interaction.user.id}`)

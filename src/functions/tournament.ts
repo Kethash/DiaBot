@@ -36,17 +36,20 @@ export async function getTournament(redisClient: ReturnType<typeof createClient>
     {
         path: "."
     }
-    ) as Tournament;
+    ) as Tournament | null;
 
-    if (tournament == null) return { name: "undefined", participants: []};
+    if (tournament == null) return { name: "undefined", host: "unknown", participants: []};
     return tournament;
 }
 
-export async function getAllTournaments(redisClient: ReturnType<typeof createClient>, serverName: string): Promise<Array<[Tournament, string]>> {
+export async function getAllTournaments(redisClient: ReturnType<typeof createClient>, serverName: string, username?: string): Promise<Array<[Tournament, string]>> {
     const tournamentKeys: string[] = await redisClient.KEYS(`tournament:${serverName}:*`);
     const tournaments: Array<[Tournament, string]> = [];
     for (const tournamentKey of tournamentKeys) {
         tournaments.push([await getTournament(redisClient, tournamentKey), tournamentKey]);
+    }
+    if (username) {
+        return tournaments.filter((tournament: [Tournament, string]) => tournament[0].host === username);
     }
     return tournaments;
 }
