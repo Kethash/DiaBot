@@ -1,5 +1,5 @@
 // Tournament object types
-export type Tournament = {
+export type TournamentObject = {
     name: string,
     host: string,
     participants: string[]

@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { createClient } from "redis";
-import { Tournament } from "../types/redisJsonTypes";
+import { TournamentObject } from "../types/redisJsonTypes";
 
 export async function createTournamentParticipantsCollector(interaction: ChatInputCommandInteraction, joinButtonCustomId: string, tournamentName: string): Promise<void> {
 
@@ -31,25 +31,25 @@ export async function checkIfTournamentExists(redisClient: ReturnType<typeof cre
     return keyExists == 1 ? true : false;
 }
 
-export async function getTournament(redisClient: ReturnType<typeof createClient>, tournamentKey: string): Promise<Tournament> {
-    const tournament: Tournament | null = await redisClient.json.get(tournamentKey, 
+export async function getTournament(redisClient: ReturnType<typeof createClient>, tournamentKey: string): Promise<TournamentObject> {
+    const tournament: TournamentObject | null = await redisClient.json.get(tournamentKey, 
     {
         path: "."
     }
-    ) as Tournament | null;
+    ) as TournamentObject | null;
 
     if (tournament == null) return { name: "undefined", host: "unknown", participants: []};
     return tournament;
 }
 
-export async function getAllTournaments(redisClient: ReturnType<typeof createClient>, serverName: string, username?: string): Promise<Array<[Tournament, string]>> {
+export async function getAllTournaments(redisClient: ReturnType<typeof createClient>, serverName: string, username?: string): Promise<Array<[TournamentObject, string]>> {
     const tournamentKeys: string[] = await redisClient.KEYS(`tournament:${serverName}:*`);
-    const tournaments: Array<[Tournament, string]> = [];
+    const tournaments: Array<[TournamentObject, string]> = [];
     for (const tournamentKey of tournamentKeys) {
         tournaments.push([await getTournament(redisClient, tournamentKey), tournamentKey]);
     }
     if (username) {
-        return tournaments.filter((tournament: [Tournament, string]) => tournament[0].host === username);
+        return tournaments.filter((tournament: [TournamentObject, string]) => tournament[0].host === username);
     }
     return tournaments;
 }
