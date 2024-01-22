@@ -1,7 +1,10 @@
-import { ActionRowBuilder, CacheType, ChatInputCommandInteraction, ComponentType, EmbedBuilder, PermissionsBitField, Role, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, CacheType, ChatInputCommandInteraction, ComponentType, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
 import challonge_config from "../../challonge-config.json";
 import { createTournamentParticipantsCollector, getAllTournaments } from "../functions/tournament";
 import { createClient } from "redis";
+import { createTournamentButtons } from "../functions/buttons/tournament-buttons";
+import { TournamentObject } from "../types/redisJsonTypes";
+import { Tournament } from "../structures/Tournament";
 
 export = {
     data: new SlashCommandBuilder()
@@ -21,6 +24,9 @@ export = {
         ).addSubcommand(subcommand =>
             subcommand.setName('delete')
                 .setDescription("Deletes a tournament")
+        ).addSubcommand(subcommand =>
+            subcommand.setName('info')
+                .setDescription('Get precise info from a tournament')
         ),
 
     async execute(redisClient: ReturnType<typeof createClient>, interaction: ChatInputCommandInteraction<CacheType>) {
@@ -94,7 +100,7 @@ export = {
                 const deleteActionRow: ActionRowBuilder<StringSelectMenuBuilder> = new ActionRowBuilder<StringSelectMenuBuilder>()
                     .addComponents(deleteStringSelectMenu);
 
-                const deleteResponse = await interaction.reply({components: [deleteActionRow], ephemeral: true})
+                const deleteResponse = await interaction.reply({components: [deleteActionRow], ephemeral: true});
 
                 // collectors
                 const deletestringselectcollector = deleteResponse.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 300_000 });
@@ -109,6 +115,73 @@ export = {
                     else await deleteResponse.edit({ content: "No reply for 5 minutes, aborting task. ", components: [] });
                 })
                 
+                break;
+
+            case 'info':
+                const showOptions = [];
+                for (const option of await getAllTournaments(redisClient, serverName)) {
+                    showOptions.push({
+                        label: option[0].name,
+                        value: option[1]
+                    });
+                }
+
+                if (showOptions.length === 0) return interaction.reply({ content: "There is no tournament.", ephemeral: true})
+
+                const showStringSelectMenu =  new StringSelectMenuBuilder()
+                        .setCustomId(`showtournament-${interaction.user.id}`)
+                        .setPlaceholder("Choose a tournament to show info")
+                        .addOptions(showOptions)
+
+                const showActionRow: ActionRowBuilder<StringSelectMenuBuilder> = new ActionRowBuilder<StringSelectMenuBuilder>()
+                    .addComponents(showStringSelectMenu);
+                
+                const showResponse = await interaction.reply({components: [showActionRow], ephemeral: true});
+                // collectors
+                const showstringselectcollector = showResponse.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 300_000 });
+                showstringselectcollector.on('collect', async i => {
+                    const choice: string = i.values[0];
+                    const showSelectedTournament: TournamentObject = await redisClient.json.GET(choice) as TournamentObject;
+                    const showTournamentEmbed: EmbedBuilder = new EmbedBuilder()
+                        .setTitle("Tournament info")
+                        .setDescription(`Tournament name: ${showSelectedTournament.name}`)
+                        .addFields(
+                            { name: `Hosted by`, value: `${showSelectedTournament.host}`, inline: true },
+                            { name: 'Participants', value: `${showSelectedTournament.participants.length}`, inline: true }
+                        )
+                        .setFooter({ text: "Wanna more info like the list of the participants ?\nDownload the infos into a file !"});
+
+                    const downloadFilesButtons = createTournamentButtons();
+                    const actionRowShowButtons = new ActionRowBuilder<ButtonBuilder>().addComponents(downloadFilesButtons);
+
+                    // create buttons, waiting for refactorization
+                    const showTournamentMessage = await interaction.channel?.send({embeds: [showTournamentEmbed], components: [actionRowShowButtons] });
+
+                    const showTournamentMessageCollector = showTournamentMessage?.createMessageComponentCollector({ componentType: ComponentType.Button, time: 300_000 });
+                    showTournamentMessageCollector?.on('collect', async i => {
+                        const showSelectedTournamentClass: Tournament = new Tournament(showSelectedTournament.name, showSelectedTournament.host, showSelectedTournament.participants);
+                        console.log(i.customId);
+                        switch (i.customId) {
+                            case 'dltxt':
+                                await i.reply({ files: [new AttachmentBuilder(showSelectedTournamentClass.toTxt(), {name: `${showSelectedTournamentClass.name}.txt`})] , ephemeral: true });
+                                break;
+                            case 'dlcsv':
+                                await i.reply({ files: [new AttachmentBuilder(showSelectedTournamentClass.toCsv(), {name: `${showSelectedTournamentClass.name}.csv`})], ephemeral: true });
+                                break;
+                            case 'dljson':
+                                await i.reply({ files: [new AttachmentBuilder(showSelectedTournamentClass.toJSON(), {name: `${showSelectedTournamentClass.name}.json`})], ephemeral: true });
+                                break;
+                        }
+                    });
+
+                    showstringselectcollector.stop("selected");
+                });
+
+                showstringselectcollector.on('end', async (i, reason) => {
+                    if (reason == "selected") return await showResponse.delete();
+                    else await showResponse.edit({ content: "No reply for 5 minutes, aborting task. ", components: [] });
+                });
+
                 break;
         }
     }
