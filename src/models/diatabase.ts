@@ -31,7 +31,8 @@ export const serverconfig = new Schema(ServerConfigSchema, {
 	guildId: { type: 'string' },
     guildName: { type: 'string' },
 	loveleaveChannelId: { type: 'string' },
-	loveleaveTime: { type: 'number' }
+	loveleaveTime: { type: 'number' },
+    botroles: { type: 'string[]' }
 });
 
 export interface QuizzSchema {

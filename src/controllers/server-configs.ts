@@ -38,7 +38,8 @@ export async function createConfig(guildID: string, guildName: string): Promise<
         guildId: guildID,
         guildName: guildName,
         loveleaveChannelId: '',
-        loveleaveTime: 5
+        loveleaveTime: 5,
+        botroles: []
     });
     return rep;
 }
