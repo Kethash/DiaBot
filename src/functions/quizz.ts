@@ -1,5 +1,5 @@
 import axios from "axios";
-import {ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, MessageCreateOptions, PartialMessage, StageChannel, TextBasedChannel } from "discord.js";
+import {ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction, Message, MessageCreateOptions, ModalMessageModalSubmitInteraction, ModalSubmitInteraction, PartialMessage, StageChannel, TextBasedChannel } from "discord.js";
 import sharp from "sharp";
 
 let noEmotes = [
@@ -73,6 +73,8 @@ export async function sendQuizzMessage(quizzName: string, userId: string, channe
     });
 }
 
+
+// Quiz answer by message replying
 export async function replyQuizzAnswer(successToAnswer: boolean, answer: any, message: Message | PartialMessage): Promise<boolean> {
     const yesEmote = yesEmotes[Math.floor(Math.random() * yesEmotes.length)];
     const noEmote = noEmotes[Math.floor(Math.random() * noEmotes.length)];
@@ -83,6 +85,21 @@ export async function replyQuizzAnswer(successToAnswer: boolean, answer: any, me
     }
     else {
         await message.reply(`${noEmote} BUU BUU DESUWA ! ${noEmote}\n Corrects answers were : \n - ${answer.answers.replaceAll(';', '\n - ')} `);
+        return false;
+    }
+}
+
+// Quiz answer by modal submitting
+export async function replyQuizzAnswerModal(successToAnswer: boolean, answer: any, interaction: ModalSubmitInteraction): Promise<boolean> {
+    const yesEmote = yesEmotes[Math.floor(Math.random() * yesEmotes.length)];
+    const noEmote = noEmotes[Math.floor(Math.random() * noEmotes.length)];
+
+    if (successToAnswer) {
+        await interaction.reply(`${yesEmote} Correct ! ❤ ${yesEmote}`);
+        return true;
+    }
+    else {
+        await interaction.reply(`${noEmote} BUU BUU DESUWA ! ${noEmote}\n Corrects answers were : \n - ${answer.answers.replaceAll(';', '\n - ')} `);
         return false;
     }
 }
@@ -122,6 +139,11 @@ async function createQuizEmbed(title: string, imageFileName?: string, attachment
         .setColor("#FD5E53")
         .setTitle(title)
 
+    const answerButtonComponent = new ButtonBuilder()
+                                .setLabel('Answer')
+                                .setCustomId('answer-button')
+                                .setStyle(ButtonStyle.Success)
+
     if (!gameId) {
         const skipButtonComponent = new ButtonBuilder()
         .setCustomId('skip')
@@ -129,10 +151,17 @@ async function createQuizEmbed(title: string, imageFileName?: string, attachment
         .setStyle(ButtonStyle.Primary);
 
         const row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(skipButtonComponent);
+            .addComponents(skipButtonComponent)
+            .addComponents(answerButtonComponent);
 
         options['components'] = [row];
+    } else {
+        const row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
+        .addComponents(answerButtonComponent);
+        
+        options['components'] = [row];
     }
+
 
     if (typeof attachment !== 'undefined' && typeof imageFileName !== 'undefined') {
         embed.setImage('attachment://' + imageFileName);

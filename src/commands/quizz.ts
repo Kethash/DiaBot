@@ -149,7 +149,7 @@ export = {
                 });
             }
 
-            const row: ActionRowBuilder<any> = new ActionRowBuilder()
+            const row: ActionRowBuilder<StringSelectMenuBuilder> = new ActionRowBuilder<StringSelectMenuBuilder>()
                 .addComponents(
                     new StringSelectMenuBuilder()
                         .setCustomId('removequizz')

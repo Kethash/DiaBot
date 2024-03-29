@@ -1,51 +1,48 @@
-import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonComponent, EmbedBuilder, Events, Message, MessageActionRowComponent, MessageComponent, MessageType, StageChannel, TextBasedChannel, TextChannel, userMention } from "discord.js";
+import { ActionRow, ActionRowBuilder, ActionRowComponent, ButtonBuilder, ButtonComponent, EmbedBuilder, Events, Message, MessageActionRowComponent, MessageComponent, ModalSubmitInteraction, StageChannel, TextBasedChannel, userMention } from "discord.js";
 import { compareAnswers } from "../functions/answer-parsing";
-import {sendQuizzMessage, replyQuizzAnswer, Player} from "../functions/quizz";
-import config from "../../config.json"
+import { RedisClientType } from "redis";
+import { Player, replyQuizzAnswerModal, sendQuizzMessage } from "../functions/quizz";
 
 export = {
-    name: Events.MessageCreate,
-    async execute(redisClient: any, message: Message) {
-        if (message.author.bot) return;
-        if (!(message.type === MessageType.Reply)) return;
+    name: Events.InteractionCreate,
+    async execute(redisClient: RedisClientType, interaction: ModalSubmitInteraction) {
+        if (!interaction.isModalSubmit()) return;
 
-        const repliedTo = await (message.channel as Exclude<TextBasedChannel, StageChannel>).messages.fetch(message.reference?.messageId as string);
-        const messageReference = await message.channel.messages.fetch(message.reference?.messageId as string);
-
-        if (repliedTo.author.id !== config.clientID) return;
-
-        let answer = await redisClient.json.get(`answer:${message.reference?.messageId}`, '.');
+        const messageId: string = interaction.customId.split(':')[1];
+        const answer: any = await redisClient.json.get(`answer:${messageId}`, { path: '.' });
         if (answer === null) return; // Prevent from multiple responses when players play together
-
-        let successToAnswer = answer.answers.split(';').some((answerString: string) => compareAnswers(message.content, answerString, answer?.isStrict ?? false));
-
-        let game = null;
+        const successToAnswer = answer.answers.split(';').some((answerString: string) => compareAnswers(interaction.fields.getTextInputValue(`answer-input:${messageId}`), answerString, answer?.isStrict ?? false));
 
         // Multiplayer : Player score Update
+        let game: any = null;
+
+        const messageReference = await interaction.channel?.messages.fetch(messageId) as Message;
+        const authorId = messageReference.author.id;
+
         if(answer.gameId) {
-            game = await redisClient.json.get(`quizz:multiplayer:lobby:${answer.gameId}`, '.');
-            if (game.actualQuizzCount >= game.quizzEndCounter || !game.players[message.author.id]) {
+            game = await redisClient.json.get(`quizz:multiplayer:lobby:${answer.gameId}`, { path: '.' });
+            if (game.actualQuizzCount >= game.quizzEndCounter || !game.players[authorId]) {
                 return;
             }
 
             game.actualQuizzCount++;
-            if (await replyQuizzAnswer(successToAnswer, answer, message)) game.players[message.author.id].score++;
-            else game.players[message.author.id].score--;
+            if (await replyQuizzAnswerModal(successToAnswer, answer, interaction)) game.players[authorId].score++;
+            else game.players[authorId].score--;
             // let quizzCreatedAt = new Date(game.players[message.author.id].message_created_at);
             let quizzCreatedAt = new Date(answer.message_created_at);
-            let replyCreatedAt = message.createdAt;
+            let replyCreatedAt = messageReference.createdAt;
             // DEBUG
             // console.log("createdAt", quizzCreatedAt, replyCreatedAt)
             const responseTimeInSecond = (replyCreatedAt.getTime() - quizzCreatedAt.getTime()) / 1000;
-            game.players[message.author.id].response_times.push(responseTimeInSecond);
+            game.players[authorId].response_times.push(responseTimeInSecond);
 
             await redisClient.json.set(`quizz:multiplayer:lobby:${answer.gameId}`, '.', game);
         } else {
-            await replyQuizzAnswer(successToAnswer, answer, message);
+            await replyQuizzAnswerModal(successToAnswer, answer, interaction);
         }
 
         // Suppression clef
-        await redisClient.json.del(`answer:${message.reference?.messageId}`, '.');
+        await redisClient.json.del(`answer:${messageReference.id}`, '.');
         const buttonActionRow: ActionRow<MessageActionRowComponent> = messageReference.components[0];
         const disabledButtonActionRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>();
         buttonActionRow.components.forEach((component: MessageComponent) => {
@@ -57,14 +54,14 @@ export = {
 
         await messageReference.edit({components: [disabledButtonActionRow]});
 
-        let playerProfile = await redisClient.json.get(`answer:player:${message.author.id}`, '.');
+        let playerProfile: any = await redisClient.json.get(`answer:player:${authorId}`, { path: '.' });
         if (playerProfile === null) playerProfile = {};
         if (!playerProfile.quizzs) playerProfile.quizzs = {};
         if (!playerProfile.quizzs[answer.quizz_id]) {
             playerProfile.quizzs[answer.quizz_id] = { playCount: 0, quizz_id: answer.quizz_id };
         }
         playerProfile.quizzs[answer.quizz_id].playCount++;
-        await redisClient.json.set(`answer:player:${message.author.id}`, '.', playerProfile);
+        await redisClient.json.set(`answer:player:${authorId}`, '.', playerProfile);
 
         // Multiplayer : End game message
         if(game && game.actualQuizzCount === game.quizzEndCounter){
@@ -111,15 +108,16 @@ export = {
                 })
             );
 
-            message.reply({content: `${description}`, embeds: [scores_embed]});
+            interaction.reply({content: `${description}`, embeds: [scores_embed]});
 
             return;
         }
 
         const quizzName = answer.quizz_id;
-        const channel: Exclude<TextBasedChannel, StageChannel> = message.channel as Exclude<TextBasedChannel, StageChannel>;
-        const userId = message.author.id;
+        const channel: Exclude<TextBasedChannel, StageChannel> = messageReference.channel as Exclude<TextBasedChannel, StageChannel>;
 
-        await sendQuizzMessage(quizzName, userId, channel, redisClient, answer.gameId);
+        await sendQuizzMessage(quizzName, authorId, channel, redisClient, answer.gameId);
+
+
     }
 }

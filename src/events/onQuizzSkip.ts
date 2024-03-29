@@ -1,4 +1,4 @@
-import { Events, TextChannel, Interaction , User, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { Events, TextChannel, Interaction , User, ActionRowBuilder, ButtonBuilder, ButtonStyle, ActionRow, MessageActionRowComponent, ButtonComponent, MessageComponent } from "discord.js";
 import { sendQuizzMessage, replyQuizzAnswer } from "../functions/quizz";
 
 export = {
@@ -22,16 +22,16 @@ export = {
 
         const channel: TextChannel = interaction.message.channel as TextChannel;
 
-        const disabledButton: any = new ActionRowBuilder()
-        .addComponents(
-            new ButtonBuilder()
-                .setCustomId('skip')
-                .setEmoji('⏭️')
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(true)
-        );
+        const buttonActionRow: ActionRow<MessageActionRowComponent> = interaction.message.components[0]
+        const disabledButtonActionRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>();
+        buttonActionRow.components.forEach((component: MessageComponent) => {
+            if (!(component instanceof ButtonComponent)) return;
+            const newButton = ButtonBuilder.from(component);
+            newButton.setDisabled(true);
+            disabledButtonActionRow.addComponents(newButton);
+        });
 
-        await interaction.update({components: [disabledButton]})
+        await interaction.update({components: [disabledButtonActionRow]});
 
         await replyQuizzAnswer(false, answer, interaction.message);
         await sendQuizzMessage(answer.quizz_id, answer.author_id, channel, redisClient, null);

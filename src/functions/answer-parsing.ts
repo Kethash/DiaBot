@@ -18,7 +18,7 @@ export function compareAnswers(answer1: string, answer2: string, isStrict: boole
     if (isStrict) {
         return answerFormatted1 === answerFormatted2;
     } else {
-        const result = FuzzySet([answerFormatted1]).get(answerFormatted2);
+        const result = fuzzySet.get(answerFormatted2);
         //@ts-ignore
         return result === null ? false : result[0][0] >= 0.8;
     }
