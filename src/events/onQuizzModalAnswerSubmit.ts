@@ -10,14 +10,17 @@ export = {
 
         const messageId: string = interaction.customId.split(':')[1];
         const answer: any = await redisClient.json.get(`answer:${messageId}`, { path: '.' });
+        const userAnswer: string = interaction.fields.getTextInputValue(`answer-input:${messageId}`);
         if (answer === null) return; // Prevent from multiple responses when players play together
-        const successToAnswer = answer.answers.split(';').some((answerString: string) => compareAnswers(interaction.fields.getTextInputValue(`answer-input:${messageId}`), answerString, answer?.isStrict ?? false));
+        const successToAnswer = answer.answers.split(';').some((answerString: string) => compareAnswers(userAnswer, answerString, answer?.isStrict ?? false));
 
         // Multiplayer : Player score Update
         let game: any = null;
 
         const messageReference = await interaction.channel?.messages.fetch(messageId) as Message;
         const authorId = messageReference.author.id;
+
+        await messageReference.reply({content: `${messageReference.author.displayName} (${messageReference.author.globalName}) wrote: ${userAnswer}`});
 
         if(answer.gameId) {
             game = await redisClient.json.get(`quizz:multiplayer:lobby:${answer.gameId}`, { path: '.' });
