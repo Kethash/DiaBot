@@ -20,7 +20,7 @@ export = {
         const messageReference = await interaction.channel?.messages.fetch(messageId) as Message;
         const authorId = messageReference.author.id;
 
-        await messageReference.reply({content: `${messageReference.author.displayName} (${messageReference.author.globalName}) wrote: ${userAnswer}`});
+        await messageReference.reply({content: `${interaction.user.displayName} (${interaction.user.globalName}) wrote: ${userAnswer}`});
 
         if(answer.gameId) {
             game = await redisClient.json.get(`quizz:multiplayer:lobby:${answer.gameId}`, { path: '.' });
