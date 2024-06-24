@@ -14,20 +14,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/rest": "^1.0.1",
-    "@sentry/node": "^7.29.0",
-    "@sentry/tracing": "^7.29.0",
-    "axios": "^1.2.1",
-    "discord.js": "^14.12.1",
+    "@discordjs/rest": "^2.3.0",
+    "@sentry/node": "^8.11.0",
+    "@sentry/tracing": "^7.114.0",
+    "axios": "^1.7.2",
+    "discord.js": "^14.15.3",
     "fuzzyset": "^1.0.7",
-    "redis": "^4.2.0",
+    "redis": "^4.6.14",
     "redis-om": "^0.3.6",
-    "sharp": "^0.33.1"
+    "sharp": "^0.33.4"
   },
   "devDependencies": {
-    "@types/fuzzyset": "^1.0.4",
-    "@types/sharp": "^0.31.0",
-    "eslint": "8.51.0",
+    "@types/fuzzyset": "^1.0.7",
+    "eslint": "9.5.0",
     "typescript": "5.2.2"
   }
 }
