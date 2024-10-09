@@ -26,20 +26,22 @@ export = {
             return;
         }
 
-        let musicList: Music[] = [];
+        let musicList: any[] = [];
 
         if (title != null) {
+            console.log("plop");
             musicList = await getMusicbyTitle(title);
         } else if (group != null) {
+            console.log("plopplop");
             musicList = await getMusicbyGroup(group);
         }
 
         const options: {label: string, description: string, value: string}[] = [] 
         musicList.forEach(e => {
             options.push({
-                label: e.toJSON().title,
-                description: e.toJSON().group,
-                value: e.toJSON().audio_url
+                label: e.title,
+                description: e.group,
+                value: e.audio_url
             })
         });
 
@@ -54,7 +56,8 @@ export = {
         const embed: EmbedBuilder = new EmbedBuilder()
         .setColor("#FD5E53")
         .setTitle('I found these, select your music');
-
+        
+        
         await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
 
     }

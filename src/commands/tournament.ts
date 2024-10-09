@@ -1,4 +1,4 @@
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, CacheType, ChatInputCommandInteraction, ComponentType, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonInteraction, CacheType, ChatInputCommandInteraction, Collection, ComponentType, DMChannel, EmbedBuilder, NewsChannel, PartialDMChannel, PartialGroupDMChannel, PrivateThreadChannel, PublicThreadChannel, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction, TextChannel, VoiceChannel } from "discord.js";
 import challonge_config from "../../challonge-config.json";
 import { createTournamentParticipantsCollector, getAllTournaments } from "../functions/tournament";
 import { createClient } from "redis";
@@ -110,7 +110,7 @@ export = {
                     deletestringselectcollector.stop("selected");
                 });
 
-                deletestringselectcollector.on('end', async (i, reason) => {
+                deletestringselectcollector.on('end', async (i: Collection<string, StringSelectMenuInteraction<CacheType>>, reason: string) => {
                     if (reason == "selected") await deleteResponse.edit({ content: "Tournament deleted successfully !", components: [] });
                     else await deleteResponse.edit({ content: "No reply for 5 minutes, aborting task. ", components: [] });
                 })
@@ -155,10 +155,10 @@ export = {
                     const actionRowShowButtons = new ActionRowBuilder<ButtonBuilder>().addComponents(downloadFilesButtons);
 
                     // create buttons, waiting for refactorization
-                    const showTournamentMessage = await interaction.channel?.send({embeds: [showTournamentEmbed], components: [actionRowShowButtons] });
+                    const showTournamentMessage = await (interaction.channel as TextChannel)?.send({embeds: [showTournamentEmbed], components: [actionRowShowButtons] });
 
                     const showTournamentMessageCollector = showTournamentMessage?.createMessageComponentCollector({ componentType: ComponentType.Button, time: 300_000 });
-                    showTournamentMessageCollector?.on('collect', async i => {
+                    showTournamentMessageCollector?.on('collect', async (i: ButtonInteraction<CacheType>) => {
                         const showSelectedTournamentClass: Tournament = new Tournament(showSelectedTournament.name, showSelectedTournament.host, showSelectedTournament.participants);
                         console.log(i.customId);
                         switch (i.customId) {
@@ -177,7 +177,7 @@ export = {
                     showstringselectcollector.stop("selected");
                 });
 
-                showstringselectcollector.on('end', async (i, reason) => {
+                showstringselectcollector.on('end', async (i: Collection<string, StringSelectMenuInteraction<CacheType>>, reason: string) => {
                     if (reason == "selected") return await showResponse.delete();
                     else await showResponse.edit({ content: "No reply for 5 minutes, aborting task. ", components: [] });
                 });

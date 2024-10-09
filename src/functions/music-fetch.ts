@@ -5,7 +5,7 @@ export async function downloadMusic(url: string): Promise<{data: Buffer | null, 
     let audioBuffer: Buffer | null = null;
 
     try {
-        const res: AxiosResponse = await axios.get(url, { responseType: "arraybuffer" });
+        const res: AxiosResponse = await axios.get(`https://static.wikia.nocookie.net/love-live/images/${url}`, { responseType: "arraybuffer" });
         audioBuffer = Buffer.from(res.data, 'binary');
     } catch(error) {
         console.error(`Couldn't download: ${url}`)

@@ -1,4 +1,4 @@
-import { ButtonInteraction, CacheType, ChatInputCommandInteraction, ComponentType, EmbedBuilder, MessageComponentInteraction, StageChannel, TextBasedChannel } from "discord.js";
+import { ButtonInteraction, CacheType, ChatInputCommandInteraction, Collection, ComponentType, DMChannel, EmbedBuilder, MessageComponentInteraction, NewsChannel, PartialDMChannel, PartialGroupDMChannel, PrivateThreadChannel, PublicThreadChannel, StageChannel, TextBasedChannel, TextChannel, VoiceChannel } from "discord.js";
 import { sendQuizzMessage } from "./quizz";
 
 const timeoutEmbed: EmbedBuilder = new EmbedBuilder()
@@ -6,11 +6,12 @@ const timeoutEmbed: EmbedBuilder = new EmbedBuilder()
                                     .setTitle('Lobby timed out')
                                     .setDescription('Please recreate one');
 
+type excludedChanelTypes = DMChannel | PartialDMChannel | PartialGroupDMChannel | NewsChannel | TextChannel | PublicThreadChannel<boolean> | PrivateThreadChannel | VoiceChannel
 
 export async function createMultiplayerGame(redisClient: any, interaction: ChatInputCommandInteraction,quizzId: string , joinButtonCustomId: string, startButtonCustomId: string, ownerId: string, gameId: string, lobbyEmbed: EmbedBuilder) {
     // Collector for the join button
     const joinfilter = (i: MessageComponentInteraction) => i.customId === joinButtonCustomId;
-    const joinCollector = (interaction.channel as Exclude<TextBasedChannel, StageChannel>).createMessageComponentCollector({ filter: joinfilter, componentType: ComponentType.Button, time: 300000 });
+    const joinCollector = (interaction.channel as Exclude<TextBasedChannel, excludedChanelTypes>).createMessageComponentCollector({ filter: joinfilter, componentType: ComponentType.Button, time: 300000 });
 
     joinCollector.on('collect', async (i: ButtonInteraction<CacheType>) => {
 
@@ -30,7 +31,7 @@ export async function createMultiplayerGame(redisClient: any, interaction: ChatI
         await i.reply({embeds: [joinEmbed]})
     })
 
-    joinCollector.on('end', async (_collected, reason) => {
+    joinCollector.on('end', async (_collected: Collection<string, ButtonInteraction<CacheType>>, reason: string) => {
         if (reason === 'time') {
             await redisClient.json.del(`quizz:multiplayer:lobby:${gameId}`); // deletes the game's key
             interaction.editReply({embeds: [timeoutEmbed], components: []});
@@ -39,7 +40,7 @@ export async function createMultiplayerGame(redisClient: any, interaction: ChatI
     
     // Collector for the start button
     const startfilter = (i: MessageComponentInteraction) => (i.customId === startButtonCustomId);
-    const startButtoncollector = (interaction.channel as Exclude<TextBasedChannel, StageChannel>).createMessageComponentCollector({ filter: startfilter, componentType: ComponentType.Button, time: 300000 });
+    const startButtoncollector = (interaction.channel as Exclude<TextBasedChannel, excludedChanelTypes>).createMessageComponentCollector({ filter: startfilter, componentType: ComponentType.Button, time: 300000 });
 
     startButtoncollector.on('collect', async (i: ButtonInteraction<CacheType>) => {
         const nb_players = Object.values((await redisClient.json.get(`quizz:multiplayer:lobby:${gameId}`, '.')).players).length;

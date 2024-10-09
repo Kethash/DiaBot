@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, EmbedBuilder, TextChannel } from "discord.js";
 import { createClient } from "redis";
 import { TournamentObject } from "../types/redisJsonTypes";
 
@@ -23,7 +23,7 @@ export async function createTournamentParticipantsCollector(interaction: ChatInp
         .addFields({name: `Tournament name: ${tournamentName}`, value: '\u200b'})
         .setDescription("Click on the buttons to register or cancel your registration !");
     
-    await interaction.channel?.send({embeds: [embed], components: [actionRow]});
+    await (interaction.channel as TextChannel)?.send({embeds: [embed], components: [actionRow]});
 }
 
 export async function checkIfTournamentExists(redisClient: ReturnType<typeof createClient>, tournamentId: string): Promise<boolean> {

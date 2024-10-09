@@ -14,15 +14,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/rest": "^2.3.0",
+    "@discordjs/rest": "2.4.0",
     "@sentry/node": "^8.11.0",
     "@sentry/tracing": "^7.114.0",
-    "axios": "^1.7.2",
-    "discord.js": "^14.15.3",
+    "axios": "1.7.7",
+    "discord.js": "14.16.3",
     "fuzzyset": "^1.0.7",
     "redis": "^4.6.14",
     "redis-om": "^0.3.6",
-    "sharp": "^0.33.4"
+    "sharp": "0.33.5"
   },
   "devDependencies": {
     "@types/fuzzyset": "^1.0.7",
