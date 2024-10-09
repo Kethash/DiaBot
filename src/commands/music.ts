@@ -11,17 +11,14 @@ export = {
         .addStringOption(option =>
             option.setName('title')
                 .setDescription("Search a lovelive music by title")
-                .setRequired(false)
-        ).addStringOption(option =>
-            option.setName('group')
-                .setDescription("Search musics by group name")
-                .setRequired(false)
+                .setRequired(true)
         ),
+
     async execute(redisClient: RedisClientType, interaction: any) {
         const title: string | null = interaction.options.get('title') ? (interaction.options.get('title')?.value as string).toLowerCase() : null;
         const group: string | null = interaction.options.get('group') ? interaction.options.get('group')?.value as string : null;
         
-        if ([title, group].every(e => e === null)) {
+        if (title === null) {
             await interaction.reply({ content: 'You must fill any option !', ephemeral: true });
             return;
         }
@@ -29,11 +26,8 @@ export = {
         let musicList: any[] = [];
 
         if (title != null) {
-            console.log("plop");
             musicList = await getMusicbyTitle(title);
-        } else if (group != null) {
-            console.log("plopplop");
-            musicList = await getMusicbyGroup(group);
+            if (musicList.length > 25) musicList = musicList.slice(0,24);
         }
 
         const options: {label: string, description: string, value: string}[] = [] 
