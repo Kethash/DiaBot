@@ -41,7 +41,7 @@ export = {
             options.push({
                 label: e.title,
                 description: e.group,
-                value: e.audio_url
+                value: e.title
             })
         });
 

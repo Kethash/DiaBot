@@ -9,7 +9,10 @@ export = {
 
         try {
             const fetchedMusic = await downloadMusic(interaction.values[0]);
-            await interaction.reply({ files: [new AttachmentBuilder(fetchedMusic.data as Buffer, {name: 'musicfile.ogg'})], ephemeral: true })
+            if (interaction.channel?.isSendable()) {
+                await interaction.channel.send({ content: `${interaction.user.displayName} has requested ${fetchedMusic.data?.title}` })
+            }
+            await interaction.reply({ files: [new AttachmentBuilder(fetchedMusic.data?.buffer as Buffer, {name: `${fetchedMusic.data?.title}.ogg`})], ephemeral: true })
 
         } catch {
             await interaction.reply({ content: 'Sorry, there was an issue while fetching musics...', ephemeral: true });

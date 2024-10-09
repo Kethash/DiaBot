@@ -1,16 +1,17 @@
 import axios, { AxiosResponse } from "axios";
-import { Music } from "../models/music";
 
-export async function downloadMusic(url: string): Promise<{data: Buffer | null, succeed: boolean}> {
+export async function downloadMusic(searchedTitle: string): Promise<{data: {buffer: Buffer,title: string} | null, succeed: boolean}> {
     let audioBuffer: Buffer | null = null;
-
+    let music_data = null;
     try {
-        const res: AxiosResponse = await axios.get(`https://static.wikia.nocookie.net/love-live/images/${url}`, { responseType: "arraybuffer" });
+        const music = await axios.get(`http://diaflask:5000/get/${searchedTitle.replace(' ','_')}`, { responseType: "json" });
+        music_data = music.data[0];
+        const res: AxiosResponse = await axios.get(music_data.audio_url, { responseType: "arraybuffer" });
         audioBuffer = Buffer.from(res.data, 'binary');
     } catch(error) {
-        console.error(`Couldn't download: ${url}`)
+        console.error(`Couldn't download: ${searchedTitle}`)
         return {data: null, succeed: false};
     }
 
-    return {data: audioBuffer, succeed: true};
+    return {data: {buffer: audioBuffer, title: music_data.title}, succeed: true};
 }
