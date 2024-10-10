@@ -53,7 +53,7 @@ export = {
         .setColor("#FD5E53")
         .setTitle('I found these, select your music');
         
-        const response_message = await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+        await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
         
         // const collector = response_message.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 60_000 });
 
