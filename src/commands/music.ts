@@ -1,8 +1,6 @@
 import { ActionRowBuilder, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder, User } from 'discord.js';
-import { getMusicbyGroup, getMusicbyTitle } from '../middlewares/music-operations';
+import { getMusicbyTitle } from '../middlewares/music-operations';
 import { RedisClientType } from 'redis';
-import { Music } from '../models/music';
-import { downloadMusic } from '../functions/music-fetch';
 
 export = {
     data: new SlashCommandBuilder()
@@ -27,7 +25,11 @@ export = {
 
         if (title != null) {
             musicList = await getMusicbyTitle(title);
-            if (musicList.length > 25) musicList = musicList.slice(0,24);
+            if (musicList.length === 0) {
+                await interaction.reply({ content: 'Nothing found...', ephemeral: true });
+                return;
+            }
+            else if (musicList.length > 25) musicList = musicList.slice(0,24);
         }
 
         const options: {label: string, description: string, value: string}[] = [] 

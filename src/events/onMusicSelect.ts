@@ -13,7 +13,7 @@ export = {
             const fetchedMusic = await downloadMusic(interaction.values[0]);
             await interaction.editReply({ files: [new AttachmentBuilder(fetchedMusic.data?.buffer as Buffer, {name: `${fetchedMusic.data?.title}.ogg`})] })
             if (interaction.channel?.isSendable()) {
-                await interaction.channel.send({ content: `${interaction.user.displayName} listens to ${fetchedMusic.data?.title}` })
+                await interaction.channel.send({ content: `${interaction.user.displayName} listens to [${fetchedMusic.data?.title}](${fetchedMusic.data?.link})` })
             }
 
         } catch (e) {

@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 
-export async function downloadMusic(searchedTitle: string): Promise<{data: {buffer: Buffer,title: string} | null, succeed: boolean}> {
+export async function downloadMusic(searchedTitle: string): Promise<{data: {buffer: Buffer,title: string, link: string} | null, succeed: boolean}> {
     let audioBuffer: Buffer | null = null;
     let music_data = null;
     try {
@@ -13,5 +13,5 @@ export async function downloadMusic(searchedTitle: string): Promise<{data: {buff
         return {data: null, succeed: false};
     }
 
-    return {data: {buffer: audioBuffer, title: music_data.title}, succeed: true};
+    return {data: {buffer: audioBuffer, title: music_data.title, link: music_data.link}, succeed: true};
 }
