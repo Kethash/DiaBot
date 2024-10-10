@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from "axios";
+import { StringSelectMenuInteraction, CacheType } from "discord.js";
 
 export async function downloadMusic(searchedTitle: string): Promise<{data: {buffer: Buffer,title: string, link: string} | null, succeed: boolean}> {
     let audioBuffer: Buffer | null = null;
@@ -14,4 +15,8 @@ export async function downloadMusic(searchedTitle: string): Promise<{data: {buff
     }
 
     return {data: {buffer: audioBuffer, title: music_data.title, link: music_data.link}, succeed: true};
+}
+
+export async function createReply(interaction: StringSelectMenuInteraction<CacheType>) {
+
 }
