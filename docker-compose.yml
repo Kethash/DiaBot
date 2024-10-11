@@ -1,11 +1,10 @@
-version: '3'
-
 services:
   diatabase:
     container_name: 'diatabase'
     image: 'redis/redis-stack:latest'
     volumes:
       - ../redis-data/diatabase:/data
+  
   diabot:
     container_name: 'diabot'
     image: 'diabot'
@@ -13,4 +12,5 @@ services:
     ports:
       - '3000:3000'
     restart: on-failure
-
+    depends_on:
+      - diatabase
