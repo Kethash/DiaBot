@@ -4,6 +4,7 @@ services:
     image: 'redis/redis-stack:latest'
     volumes:
       - ../redis-data/diatabase:/data
+    restart: always
   
   diabot:
     container_name: 'diabot'
