@@ -55,33 +55,5 @@ export = {
         
         await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
         
-        // const collector = response_message.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 60_000 });
-
-        // collector.on("collect", async (i: any) => {
-        //     interaction.editReply({content: i.values[0], components: [], embeds: []});
-
-        //     try {
-        //         const fetchedMusic = await downloadMusic(i.values[0]);
-        //         await i.reply({ files: [new AttachmentBuilder(fetchedMusic.data?.buffer as Buffer, {name: `${fetchedMusic.data?.title}.ogg`})], ephemeral: true })
-        //         if (i.channel?.isSendable()) {
-        //             await i.channel.send({ content: `${interaction.user.displayName} listens to [${fetchedMusic.data?.title}](${fetchedMusic.data?.link})` })
-        //         }
-
-        //     } catch (e) {
-        //         await interaction.editReply({ content: 'Sorry, there was an issue while fetching musics...'});
-        //     }
-        //     collector.stop("response_collected");
-        // });
-
-        // collector.on("end", async (_collected: Collection<string, StringSelectMenuInteraction<CacheType>>, reason: string) => {
-        //     switch (reason) {
-        //         case "response_collected": {
-        //             return;
-        //         }
-        //         case 'time': {
-        //             interaction.editReply({content: "Nothing is selected for 1 minute. Aborting...", components: [], embeds: []});
-        //         }
-        //     }
-        // })
     }
 }
