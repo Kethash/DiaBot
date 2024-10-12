@@ -3,3 +3,4 @@ config.json
 logs
 src_js
 challonge-config.json
+package-lock.json

@@ -1,5 +1,5 @@
 import axios from "axios";
-import {ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction, Message, MessageCreateOptions, ModalMessageModalSubmitInteraction, ModalSubmitInteraction, PartialMessage, StageChannel, TextBasedChannel } from "discord.js";
+import {ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, DMChannel, EmbedBuilder, Interaction, Message, MessageCreateOptions, ModalMessageModalSubmitInteraction, ModalSubmitInteraction, NewsChannel, PartialDMChannel, PartialGroupDMChannel, PartialMessage, PrivateThreadChannel, PublicThreadChannel, StageChannel, TextBasedChannel, TextChannel, VoiceChannel } from "discord.js";
 import sharp from "sharp";
 
 let noEmotes = [
@@ -25,6 +25,8 @@ let yesEmotes = [
     '<:rubycool:853950147917381672>',
     '<:eliapprove:964271606379724943>'
 ];
+
+type excludedChanelTypes = DMChannel | PartialDMChannel | PartialGroupDMChannel | NewsChannel | TextChannel | PublicThreadChannel<boolean> | PrivateThreadChannel | VoiceChannel
 
 export async function sendQuizzMessage(quizzName: string, userId: string, channel: Exclude<TextBasedChannel, StageChannel>, redisClient: any, gameId: string | null ): Promise<void> {
     const quizzs: Array<{ title: string, imageLink: string, blurImage: boolean, blurRate: number, answers: string }> = await redisClient.json.get(quizzName, { path: '.quizzs' });
@@ -61,7 +63,7 @@ export async function sendQuizzMessage(quizzName: string, userId: string, channe
         }
     } else options = await createQuizEmbed(question?.title ?? "What is the title of this song ? Reply to this message to respond :)", undefined, undefined, gameId);
 
-    const message = await channel.send(options);
+    const message = await (channel as Exclude<TextBasedChannel, PartialGroupDMChannel>).send(options);
 
     redisClient.json.set(`answer:${message.id}`, '.', {
         author_id: userId,
