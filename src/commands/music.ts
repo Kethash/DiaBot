@@ -1,7 +1,8 @@
-import { ActionRowBuilder, AttachmentBuilder, CacheType, ChatInputCommandInteraction, Collection, ComponentType, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction, User } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, CacheType, ChatInputCommandInteraction, Collection, ComponentType, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuComponent, StringSelectMenuInteraction, StringSelectMenuOptionBuilder, User } from 'discord.js';
 import { getMusicbyTitle } from '../middlewares/music-operations';
 import { RedisClientType } from 'redis';
 import { downloadMusic } from '../functions/music-fetch';
+import { setEngine } from 'crypto';
 
 export = {
     data: new SlashCommandBuilder()
@@ -32,13 +33,20 @@ export = {
             else if (musicList.length > 25) musicList = musicList.slice(0,24);
         }
 
-        const options: {label: string, description: string, value: string}[] = [] 
-        musicList.forEach(e => {
-            options.push({
-                label: e.title,
-                description: e.group,
-                value: e.title
-            })
+        const musicSeen = new Set();
+        let uniquemusicList = musicList.filter(music => {
+            const duplicate = musicSeen.has(music.title);
+            musicSeen.add(music.title);
+            return !duplicate;
+        })
+
+        const options: Array<StringSelectMenuOptionBuilder> = [] 
+        uniquemusicList.forEach(e => {
+            let option: StringSelectMenuOptionBuilder = new StringSelectMenuOptionBuilder()
+                        .setLabel(e.title)
+                        .setDescription(e.group)
+                        .setValue(e.title)
+            options.push(option);
         });
 
         const row: ActionRowBuilder<StringSelectMenuBuilder> = new ActionRowBuilder<StringSelectMenuBuilder>()
