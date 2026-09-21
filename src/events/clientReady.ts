@@ -6,7 +6,7 @@ import { serverconfig, ServerConfigSchema } from "../models/diatabase";
 import { createConfig, getAllConfigs, getAllIds, getAllServerconfigs } from "../controllers/server-configs";
 
 export = {
-    name: 'ready',
+    name: 'clientReady',
 	once: true,
 	async execute(client: Client) {
 

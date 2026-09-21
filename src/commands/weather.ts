@@ -33,7 +33,7 @@ export = {
                 .setColor("#FD5E53")
                 .setTitle("Weather in " + location["name"])
                 .setDescription(location["country"])
-                .setThumbnail(`http://${current["condition"]["icon"]}`)
+                .setThumbnail(`http:${current["condition"]["icon"]}`)
                 .addFields(
                     { name: "Condition", value: current["condition"]["text"] },
                     { name: "Temp °C", value: `${current["temp_c"]}`, inline: true },

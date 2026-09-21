@@ -1,4 +1,4 @@
-import { ActionRow, ActionRowBuilder, ActionRowComponent, ButtonBuilder, ButtonComponent, EmbedBuilder, Events, Message, MessageActionRowComponent, MessageComponent, ModalSubmitInteraction, StageChannel, TextBasedChannel, userMention } from "discord.js";
+import { ActionRow, ActionRowBuilder, ActionRowComponent, ButtonBuilder, ButtonComponent, EmbedBuilder, Events, Message, MessageActionRowComponent, MessageComponent, ModalSubmitInteraction, StageChannel, TextBasedChannel, TopLevelComponent, userMention } from "discord.js";
 import { compareAnswers } from "../functions/answer-parsing";
 import { RedisClientType } from "redis";
 import { Player, replyQuizzAnswerModal, sendQuizzMessage } from "../functions/quizz";
@@ -46,7 +46,7 @@ export = {
 
         // Suppression clef
         await redisClient.json.del(`answer:${messageReference.id}`, '.');
-        const buttonActionRow: ActionRow<MessageActionRowComponent> = messageReference.components[0];
+        const buttonActionRow: ActionRow<ButtonComponent> = messageReference.components[0] as ActionRow<ButtonComponent>;
         const disabledButtonActionRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>();
         buttonActionRow.components.forEach((component: MessageComponent) => {
             if (!(component instanceof ButtonComponent)) return;
