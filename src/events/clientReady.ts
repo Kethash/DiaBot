@@ -2,11 +2,10 @@ import { Client, Guild } from "discord.js";
 import connectToRedis from "../functions/connect-to-redis";
 import { createClient } from "redis";
 import { Client as OmClient } from 'redis-om'
-import { serverconfig, ServerConfigSchema } from "../models/diatabase";
-import { createConfig, getAllConfigs, getAllIds, getAllServerconfigs } from "../controllers/server-configs";
+import { createConfig, getAllIds } from "../controllers/server-configs";
 
 export = {
-    name: 'ready',
+    name: 'clientReady',
 	once: true,
 	async execute(client: Client) {
 

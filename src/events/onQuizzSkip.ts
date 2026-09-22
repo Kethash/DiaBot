@@ -1,5 +1,5 @@
-import { Events, TextChannel, Interaction , User, ActionRowBuilder, ButtonBuilder, ButtonStyle, ActionRow, MessageActionRowComponent, ButtonComponent, MessageComponent } from "discord.js";
-import { sendQuizzMessage, replyQuizzAnswer } from "../functions/quizz";
+import { Events, TextChannel, Interaction , User, ActionRowBuilder, ButtonBuilder, ActionRow, ButtonComponent, MessageComponent } from "discord.js";
+import { sendQuizzMessage } from "../functions/quizz";
 
 export = {
     name: Events.InteractionCreate,
@@ -22,7 +22,7 @@ export = {
 
         const channel: TextChannel = interaction.message.channel as TextChannel;
 
-        const buttonActionRow: ActionRow<MessageActionRowComponent> = interaction.message.components[0]
+        const buttonActionRow: ActionRow<ButtonComponent>  = interaction.message.components[0] as ActionRow<ButtonComponent>;
         const disabledButtonActionRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>();
         buttonActionRow.components.forEach((component: MessageComponent) => {
             if (!(component instanceof ButtonComponent)) return;
@@ -33,7 +33,7 @@ export = {
 
         await interaction.update({components: [disabledButtonActionRow]});
 
-        await replyQuizzAnswer(false, answer, interaction.message);
+        // await replyQuizzAnswer(false, answer, interaction.message);
         await sendQuizzMessage(answer.quizz_id, answer.author_id, channel, redisClient, null);
 
         return;

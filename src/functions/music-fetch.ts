@@ -1,7 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import { StringSelectMenuInteraction, CacheType } from "discord.js";
 
-export async function downloadMusic(searchedTitle: string): Promise<{data: {buffer: Buffer,title: string, link: string} | null, succeed: boolean}> {
+export async function downloadMusic(searchedTitle: string): Promise<{data: {buffer: Buffer | null,title: string, link: string, audio_url?: string | null}, succeed: boolean}> {
     let audioBuffer: Buffer | null = null;
     let music_data = null;
     try {
@@ -11,7 +10,7 @@ export async function downloadMusic(searchedTitle: string): Promise<{data: {buff
         audioBuffer = Buffer.from(res.data, 'binary');
     } catch(error) {
         console.error(`Couldn't download: ${searchedTitle}`)
-        return {data: null, succeed: false};
+        return {data: {buffer: null, title: music_data.title, link: music_data.link, audio_url: music_data.audio_url}, succeed: false};
     }
 
     return {data: {buffer: audioBuffer, title: music_data.title, link: music_data.link}, succeed: true};

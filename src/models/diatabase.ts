@@ -26,6 +26,7 @@ export class ServerConfigSchema extends Entity {
     get loveleaveChannelSetup(): Boolean {
         return this.loveleaveChannelId != '';
     }
+
 }
 export const serverconfig = new Schema(ServerConfigSchema, {
 	guildId: { type: 'string' },
@@ -72,7 +73,7 @@ export class QuizzPlayerSchema extends Entity {
 export const quizzplayer = new Schema(QuizzPlayerSchema, {
     name: { type: 'string' },
     quizzID: { type: 'string' },
-    score: { type: 'number' }
+    score: { type: 'number' },
 });
 
 export class AutoQuizz extends Entity {}

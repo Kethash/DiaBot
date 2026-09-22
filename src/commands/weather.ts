@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, Embed, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import config from '../../config.json';
 
@@ -33,7 +33,7 @@ export = {
                 .setColor("#FD5E53")
                 .setTitle("Weather in " + location["name"])
                 .setDescription(location["country"])
-                .setThumbnail(`http://${current["condition"]["icon"]}`)
+                .setThumbnail(`http:${current["condition"]["icon"]}`)
                 .addFields(
                     { name: "Condition", value: current["condition"]["text"] },
                     { name: "Temp °C", value: `${current["temp_c"]}`, inline: true },

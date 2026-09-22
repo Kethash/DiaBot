@@ -1,5 +1,5 @@
 import axios from "axios";
-import {ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, DMChannel, EmbedBuilder, Interaction, Message, MessageCreateOptions, ModalMessageModalSubmitInteraction, ModalSubmitInteraction, NewsChannel, PartialDMChannel, PartialGroupDMChannel, PartialMessage, PrivateThreadChannel, PublicThreadChannel, StageChannel, TextBasedChannel, TextChannel, VoiceChannel } from "discord.js";
+import {ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, DMChannel, EmbedBuilder, Message, MessageCreateOptions, ModalSubmitInteraction, NewsChannel, PartialDMChannel, PartialGroupDMChannel, PartialMessage, PrivateThreadChannel, PublicThreadChannel, StageChannel, TextBasedChannel, TextChannel, VoiceChannel } from "discord.js";
 import sharp from "sharp";
 
 let noEmotes = [
@@ -45,7 +45,8 @@ export async function sendQuizzMessage(quizzName: string, userId: string, channe
             const urlFileExtension = question.imageLink.substring(question.imageLink.lastIndexOf('.') + 1);
 
             const actualFileExtension = (urlFileExtension.length >= 3 && urlFileExtension.length <= 4) ?
-                urlFileExtension : imageResponse.headers['content-type']?.substring(imageResponse.headers['content-type'].lastIndexOf('/') + 1);
+                urlFileExtension : imageResponse.headers['content-type']?.toString().substring(imageResponse.headers['content-type'].toString().lastIndexOf('/') + 1);
+
 
             const imageFileName = 'image.' + actualFileExtension;
 

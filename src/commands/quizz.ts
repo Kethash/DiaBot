@@ -1,4 +1,4 @@
-import { ActionRowBuilder, Attachment, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, Attachment, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
 import axios from 'axios';
 import { isValidQuizz } from '../functions/quizz';
 import { createMultiplayerGame } from '../functions/lobbyManager';
@@ -64,7 +64,7 @@ export = {
                 await interaction.reply({
                     content: "The quizz structure is invalid, the JSON file must be like" +
                         "```json\n{\n\tname: string,\n\tdescription: string,\n\tquizzs: [{\n\ttitle: string,\n\timageLink: string,\n\tblurImage: boolean,\n\tblurRate: number,\n\tanswers: string\n\t}]\n}```",
-                    ephemeral: true
+                    flags: MessageFlags.Ephemeral
                 });
                 return;
             }
@@ -72,7 +72,7 @@ export = {
 
             const name: string = json.name.toLowerCase().split(' ').join('-');
             redisClient.json.set(`quizz:json:${name}`, '.', json);
-            await interaction.reply({ content: "Quizz imported", ephemeral: true });
+            await interaction.reply({ content: "Quizz imported", flags: MessageFlags.Ephemeral });
         } else if (optionChoice == 'play') {
             const quizzs = await redisClient.KEYS('quizz:json:*');
             if (quizzs.length == 0 || quizzs == null) {
@@ -196,7 +196,7 @@ export = {
             const gameId: string = `${interaction.user.id}:${Date.now()}`;
             const ownerId: string = interaction.user.id;
 
-            const response = await interaction.reply({ embeds: [embed], components: [rowSelectQuizz], ephemeral: true })
+            const response = await interaction.reply({ embeds: [embed], components: [rowSelectQuizz], flags: MessageFlags.Ephemeral })
             // console.log(response)
             const filter = (i: any) => (i.user.id === ownerId);
             const collector = response.createMessageComponentCollector({ filter, time: 6000, max: 1 })

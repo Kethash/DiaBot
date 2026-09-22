@@ -1,8 +1,7 @@
 import axios from "axios";
-import { ActionRowBuilder, Attachment, CacheType, ChatInputCommandInteraction, ComponentType, Embed, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, Attachment, CacheType, ChatInputCommandInteraction, ComponentType, Embed, EmbedBuilder, MessageFlags, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
 import { addParticipants, createTournament, deleteTournament, finishTournament, getTournamentByUrl, showTournamentInfo } from "../functions/challonge-api";
 import challonge_config from "../../challonge-config.json";
-import { createTournamentParticipantsCollector } from "../functions/tournament";
 
 export = {
     data: new SlashCommandBuilder()
@@ -58,7 +57,7 @@ export = {
     async execute(redisClient: any, interaction: ChatInputCommandInteraction<CacheType>) {
         // Only one can use tournament command
         if (interaction.member?.user.id != challonge_config.the_chosen_one) {
-            await interaction.reply({content: "Only one person can manage tournaments !",ephemeral: true})
+            await interaction.reply({content: "Only one person can manage tournaments !",flags: MessageFlags.Ephemeral})
             return;
         }
 
@@ -97,7 +96,7 @@ export = {
                 const createResult = await createTournament(tournamentName, tournamentType);
                 if (!createResult.success) {
                     await interaction.reply({content: 'The tounament cannot be created on Challonge ! Aborting.',
-                    ephemeral: true});
+                    flags: MessageFlags.Ephemeral});
                     break;
                 }
 
@@ -119,7 +118,7 @@ export = {
     
                     const participantsJson = participantsResponse.data;
                     const addParticipantsResponse =  await addParticipants(createdTournamentURL, participantsJson);
-                    if (!addParticipantsResponse) await interaction.reply({content: 'The tournament cannot be created (error while adding participants)', ephemeral: true});
+                    if (!addParticipantsResponse) await interaction.reply({content: 'The tournament cannot be created (error while adding participants)', flags: MessageFlags.Ephemeral});
 
                     await redisClient.json.set(`tournament:${createdTournamentURL}`, '.', {
                         name: tournamentName,
@@ -133,7 +132,7 @@ export = {
                 //// TODO: Implémenter la création de tournoi avec l'API de challonge
                 await interaction.reply({
                     content: `The tournament ${tournamentName} has been successfully created !\nurl: ${createdTournamentURL}`, 
-                    ephemeral: true
+                    flags: MessageFlags.Ephemeral
                 });
                 break;
 
@@ -160,7 +159,7 @@ export = {
                         .addFields(participantsEmbed)
                         .setColor("#FD5E53")
 
-                    await interaction.reply({embeds: [showparticipantsEmbed], ephemeral: true});
+                    await interaction.reply({embeds: [showparticipantsEmbed], flags: MessageFlags.Ephemeral});
 
                 }
                 
@@ -185,7 +184,7 @@ export = {
                         .addFields(tournaments)
                         .setColor("#FD5E53");
 
-                await interaction.reply({embeds: [showTournamentsEmbed], ephemeral: true});
+                await interaction.reply({embeds: [showTournamentsEmbed], flags: MessageFlags.Ephemeral});
                 break;
 
             case 'finish':
@@ -216,7 +215,7 @@ export = {
                         .setTitle("Which tournament you want to finish ?")
                         .setDescription("Select the tournament you want to remove");
                 
-                const finishResponse = await interaction.reply({embeds: [finishTournamentEmbed], components: [removeTournamentRow] ,ephemeral: true});
+                const finishResponse = await interaction.reply({embeds: [finishTournamentEmbed], components: [removeTournamentRow] ,flags: MessageFlags.Ephemeral});
                 
                 const finishCollector = finishResponse.createMessageComponentCollector({
                     componentType: ComponentType.StringSelect
@@ -230,10 +229,10 @@ export = {
                         await redisClient.DEL(`tournament:${selection}`);
                     } catch (err) {
                         console.error(err);
-                        await i.reply({content: "Sorry, an error occured !",ephemeral: true});
+                        await i.reply({content: "Sorry, an error occured !",flags: MessageFlags.Ephemeral});
                         return;
                     } finally {
-                        await i.reply({content: "The tournament is over !",ephemeral: true});
+                        await i.reply({content: "The tournament is over !",flags: MessageFlags.Ephemeral});
                     }
                 });
                 break;
@@ -243,14 +242,14 @@ export = {
                 const deleteResult: boolean = await deleteTournament(tournamentUrl);
 
                 if(deleteResult) {
-                    await interaction.reply({ content: 'The tournament has been deleted successfully !', ephemeral: true });
+                    await interaction.reply({ content: 'The tournament has been deleted successfully !', flags: MessageFlags.Ephemeral });
                 } else {
-                    await interaction.reply({ content: "The tournament couldn't be deleted !", ephemeral: true });
+                    await interaction.reply({ content: "The tournament couldn't be deleted !", flags: MessageFlags.Ephemeral });
                 }
                 break;
 
             default:
-                await interaction.reply({ content: "Unknown error", ephemeral: true })
+                await interaction.reply({ content: "Unknown error", flags: MessageFlags.Ephemeral })
                 break;
         }
     }

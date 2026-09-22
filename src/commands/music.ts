@@ -1,7 +1,6 @@
-import { ActionRowBuilder, AttachmentBuilder, CacheType, ChatInputCommandInteraction, Collection, ComponentType, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction, User } from 'discord.js';
+import { ActionRowBuilder, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
 import { getMusicbyTitle } from '../middlewares/music-operations';
 import { RedisClientType } from 'redis';
-import { downloadMusic } from '../functions/music-fetch';
 
 export = {
     data: new SlashCommandBuilder()
@@ -17,7 +16,7 @@ export = {
         const title: string | null = interaction.options.get('title') ? (interaction.options.get('title')?.value as string).toLowerCase() : null;
 
         if (title === null) {
-            await interaction.reply({ content: 'You must fill any option !', ephemeral: true });
+            await interaction.reply({ content: 'You must fill any option !', flags: MessageFlags.Ephemeral });
             return;
         }
 
@@ -26,19 +25,26 @@ export = {
         if (title != null) {
             musicList = await getMusicbyTitle(title);
             if (musicList.length === 0) {
-                await interaction.reply({ content: 'Nothing found...', ephemeral: true });
+                await interaction.reply({ content: 'Nothing found...', flags: MessageFlags.Ephemeral });
                 return;
             }
             else if (musicList.length > 25) musicList = musicList.slice(0,24);
         }
 
-        const options: {label: string, description: string, value: string}[] = [] 
-        musicList.forEach(e => {
-            options.push({
-                label: e.title,
-                description: e.group,
-                value: e.title
-            })
+        const musicSeen = new Set();
+        let uniquemusicList = musicList.filter(music => {
+            const duplicate = musicSeen.has(music.title);
+            musicSeen.add(music.title);
+            return !duplicate;
+        })
+
+        const options: Array<StringSelectMenuOptionBuilder> = [] 
+        uniquemusicList.forEach(e => {
+            let option: StringSelectMenuOptionBuilder = new StringSelectMenuOptionBuilder()
+                        .setLabel(e.title)
+                        .setDescription(e.group)
+                        .setValue(e.title)
+            options.push(option);
         });
 
         const row: ActionRowBuilder<StringSelectMenuBuilder> = new ActionRowBuilder<StringSelectMenuBuilder>()
@@ -53,7 +59,7 @@ export = {
         .setColor("#FD5E53")
         .setTitle('I found these, select your music');
         
-        await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+        await interaction.reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral });
         
     }
 }
