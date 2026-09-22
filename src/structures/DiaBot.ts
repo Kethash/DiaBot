@@ -1,4 +1,4 @@
-import { Client, Collection, Events } from 'discord.js';
+import { Client, Collection, Events, MessageFlags } from 'discord.js';
 import fs from 'fs';
 import connectToRedis from '../functions/connect-to-redis';
 import path from 'node:path';
@@ -72,7 +72,7 @@ class DiaBot extends Client {
                 else await command.execute(interaction);
             } catch (error) {
                 console.error(error);
-                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+                await interaction.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
             }
         });
 

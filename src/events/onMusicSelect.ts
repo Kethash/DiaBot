@@ -1,4 +1,4 @@
-import { AttachmentBuilder, EmbedBuilder, Events, Interaction } from "discord.js";
+import { AttachmentBuilder, EmbedBuilder, Events, Interaction, MessageFlags } from "discord.js";
 import { downloadMusic } from "../functions/music-fetch";
 
 export = {
@@ -7,7 +7,7 @@ export = {
         if (!interaction.isStringSelectMenu()) return;
         if (interaction.customId !== 'selectmusic') return;
 
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         try {
             const fetchedMusic = await downloadMusic(interaction.values[0]);

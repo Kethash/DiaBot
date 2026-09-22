@@ -1,5 +1,5 @@
 import { createConfig, getGuildConfig } from "../controllers/server-configs";
-import { SlashCommandBuilder } from "discord.js";
+import { MessageFlags, SlashCommandBuilder } from "discord.js";
 import { ServerConfigSchema } from "../models/diatabase";
 import { setloveleavetime } from "../middlewares/server-config-operations";
 
@@ -21,17 +21,17 @@ export = {
         try {
             setloveleavetime(serverConfig.entityId,newTime);
         } catch {
-            await interaction.reply({content: "Couldn't set the new loveleave! time. I'm sorry...", ephemeral: true});
+            await interaction.reply({content: "Couldn't set the new loveleave! time. I'm sorry...", flags: MessageFlags.Ephemeral});
             return;
         }
 
         if (!serverConfig.loveleaveChannelSetup) {
             await interaction.reply({content: `Loveleavetime set on: ${newTime} minutes\n
             Be careful you didn't set any channel to display loveleavers 
-            please use /setloveleavechannel <channelId> to define one`, ephemeral: true});
+            please use /setloveleavechannel <channelId> to define one`, flags: MessageFlags.Ephemeral});
             return;
         }
 
-        await interaction.reply({content: `Loveleavetime set on: ${newTime} minutes`, ephemeral: true});
+        await interaction.reply({content: `Loveleavetime set on: ${newTime} minutes`, flags: MessageFlags.Ephemeral});
     }
 }

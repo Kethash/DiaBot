@@ -1,4 +1,4 @@
-import { EmbedBuilder, SlashCommandBuilder, User } from 'discord.js';
+import { EmbedBuilder, MessageFlags, SlashCommandBuilder, User } from 'discord.js';
 
 export = {
     data: new SlashCommandBuilder()
@@ -20,7 +20,7 @@ export = {
             )
             .setTimestamp(new Date());
 
-        await interaction.reply({ embeds: [exampleEmbed], ephemeral: true });
+        await interaction.reply({ embeds: [exampleEmbed], flags: MessageFlags.Ephemeral });
 
     }
 }

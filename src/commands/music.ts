@@ -1,4 +1,4 @@
-import { ActionRowBuilder, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
+import { ActionRowBuilder, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
 import { getMusicbyTitle } from '../middlewares/music-operations';
 import { RedisClientType } from 'redis';
 
@@ -16,7 +16,7 @@ export = {
         const title: string | null = interaction.options.get('title') ? (interaction.options.get('title')?.value as string).toLowerCase() : null;
 
         if (title === null) {
-            await interaction.reply({ content: 'You must fill any option !', ephemeral: true });
+            await interaction.reply({ content: 'You must fill any option !', flags: MessageFlags.Ephemeral });
             return;
         }
 
@@ -25,7 +25,7 @@ export = {
         if (title != null) {
             musicList = await getMusicbyTitle(title);
             if (musicList.length === 0) {
-                await interaction.reply({ content: 'Nothing found...', ephemeral: true });
+                await interaction.reply({ content: 'Nothing found...', flags: MessageFlags.Ephemeral });
                 return;
             }
             else if (musicList.length > 25) musicList = musicList.slice(0,24);
@@ -59,7 +59,7 @@ export = {
         .setColor("#FD5E53")
         .setTitle('I found these, select your music');
         
-        await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+        await interaction.reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral });
         
     }
 }

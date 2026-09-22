@@ -1,4 +1,4 @@
-import { Events, Interaction } from "discord.js";
+import { Events, Interaction, MessageFlags } from "discord.js";
 
 export = {
     name: Events.InteractionCreate,
@@ -8,7 +8,7 @@ export = {
 
         const quizzName = interaction.values[0];
         await redisClient.json.del(quizzName);
-        await interaction.reply({content: 'Quizz removed successfully', ephemeral: true});
+        await interaction.reply({content: 'Quizz removed successfully', flags: MessageFlags.Ephemeral});
         
     }
 }

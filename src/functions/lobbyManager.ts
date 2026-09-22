@@ -1,4 +1,4 @@
-import { ButtonInteraction, CacheType, ChatInputCommandInteraction, Collection, ComponentType, DMChannel, EmbedBuilder, MessageComponentInteraction, NewsChannel, PartialDMChannel, PartialGroupDMChannel, PrivateThreadChannel, PublicThreadChannel, StageChannel, TextBasedChannel, TextChannel, VoiceChannel } from "discord.js";
+import { ButtonInteraction, CacheType, ChatInputCommandInteraction, Collection, ComponentType, DMChannel, EmbedBuilder, MessageComponentInteraction, MessageFlags, NewsChannel, PartialDMChannel, PartialGroupDMChannel, PrivateThreadChannel, PublicThreadChannel, StageChannel, TextBasedChannel, TextChannel, VoiceChannel } from "discord.js";
 import { sendQuizzMessage } from "./quizz";
 
 const timeoutEmbed: EmbedBuilder = new EmbedBuilder()
@@ -47,10 +47,10 @@ export async function createMultiplayerGame(redisClient: any, interaction: ChatI
         if (!startButtonCustomId.endsWith(i.user.id)) {
             await i.reply({
                 content: "Only the host of the game can start !",
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         } else if (nb_players === 0) {
-            await i.reply({content: "You cannot start a game without any players !",ephemeral: true})
+            await i.reply({content: "You cannot start a game without any players !",flags: MessageFlags.Ephemeral})
         } else {
             joinCollector.stop('game started'); // Stops the join button from collecting new requests
             startButtoncollector.stop('game started'); // Removes the collector of the start button

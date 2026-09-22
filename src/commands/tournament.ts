@@ -1,4 +1,4 @@
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonInteraction, CacheType, ChatInputCommandInteraction, Collection, ComponentType, DMChannel, EmbedBuilder, NewsChannel, PartialDMChannel, PartialGroupDMChannel, PrivateThreadChannel, PublicThreadChannel, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction, TextChannel, VoiceChannel } from "discord.js";
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonInteraction, CacheType, ChatInputCommandInteraction, Collection, ComponentType, DMChannel, EmbedBuilder, MessageFlags, NewsChannel, PartialDMChannel, PartialGroupDMChannel, PrivateThreadChannel, PublicThreadChannel, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction, TextChannel, VoiceChannel } from "discord.js";
 import challonge_config from "../../challonge-config.json";
 import { createTournamentParticipantsCollector, getAllTournaments } from "../functions/tournament";
 import { createClient } from "redis";
@@ -32,7 +32,7 @@ export = {
     async execute(redisClient: ReturnType<typeof createClient>, interaction: ChatInputCommandInteraction<CacheType>) {
         // Only one can use tournament command
         if (interaction.member?.user.id != challonge_config.the_chosen_one) {
-            await interaction.reply({content: "Only one person can manage tournaments !",ephemeral: true})
+            await interaction.reply({content: "Only one person can manage tournaments !",flags: MessageFlags.Ephemeral})
             return;
         }
 
@@ -44,7 +44,7 @@ export = {
                 // The key used for the tournament
                 const createdTournamentKey: string = `tournament:${serverName}:${tournamentName}`;
                 if (await redisClient.json.GET(createdTournamentKey, { path: "." }) != null) {
-                    await interaction.reply({content: "BUU BUU DESUWA !\nThe tournament alredy exists !",ephemeral: true})
+                    await interaction.reply({content: "BUU BUU DESUWA !\nThe tournament alredy exists !",flags: MessageFlags.Ephemeral})
                 }
                 
                 await redisClient.json.set(createdTournamentKey, '.', {
@@ -54,7 +54,7 @@ export = {
                 });
 
                 await createTournamentParticipantsCollector(interaction, createdTournamentKey, tournamentName);
-                await interaction.reply({content: "Tournament created !", ephemeral: true});        
+                await interaction.reply({content: "Tournament created !", flags: MessageFlags.Ephemeral});        
                 break;
             case 'show':
                 // View created tournaments
@@ -90,7 +90,7 @@ export = {
                     }
                 }
 
-                if (deleteOptions.length === 0) return interaction.reply({ content: "There is no tournament.", ephemeral: true})
+                if (deleteOptions.length === 0) return interaction.reply({ content: "There is no tournament.", flags: MessageFlags.Ephemeral})
 
                 const deleteStringSelectMenu =  new StringSelectMenuBuilder()
                         .setCustomId(`removetournament-${interaction.user.id}`)
@@ -100,7 +100,7 @@ export = {
                 const deleteActionRow: ActionRowBuilder<StringSelectMenuBuilder> = new ActionRowBuilder<StringSelectMenuBuilder>()
                     .addComponents(deleteStringSelectMenu);
 
-                const deleteResponse = await interaction.reply({components: [deleteActionRow], ephemeral: true});
+                const deleteResponse = await interaction.reply({components: [deleteActionRow], flags: MessageFlags.Ephemeral});
 
                 // collectors
                 const deletestringselectcollector = deleteResponse.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 300_000 });
@@ -126,7 +126,7 @@ export = {
                     });
                 }
 
-                if (showOptions.length === 0) return interaction.reply({ content: "There is no tournament.", ephemeral: true})
+                if (showOptions.length === 0) return interaction.reply({ content: "There is no tournament.", flags: MessageFlags.Ephemeral})
 
                 const showStringSelectMenu =  new StringSelectMenuBuilder()
                         .setCustomId(`showtournament-${interaction.user.id}`)
@@ -136,7 +136,7 @@ export = {
                 const showActionRow: ActionRowBuilder<StringSelectMenuBuilder> = new ActionRowBuilder<StringSelectMenuBuilder>()
                     .addComponents(showStringSelectMenu);
                 
-                const showResponse = await interaction.reply({components: [showActionRow], ephemeral: true});
+                const showResponse = await interaction.reply({components: [showActionRow], flags: MessageFlags.Ephemeral});
                 // collectors
                 const showstringselectcollector = showResponse.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 300_000 });
                 showstringselectcollector.on('collect', async i => {
@@ -163,13 +163,13 @@ export = {
                         console.log(i.customId);
                         switch (i.customId) {
                             case 'dltxt':
-                                await i.reply({ files: [new AttachmentBuilder(showSelectedTournamentClass.toTxt(), {name: `${showSelectedTournamentClass.name}.txt`})] , ephemeral: true });
+                                await i.reply({ files: [new AttachmentBuilder(showSelectedTournamentClass.toTxt(), {name: `${showSelectedTournamentClass.name}.txt`})] , flags: MessageFlags.Ephemeral });
                                 break;
                             case 'dlcsv':
-                                await i.reply({ files: [new AttachmentBuilder(showSelectedTournamentClass.toCsv(), {name: `${showSelectedTournamentClass.name}.csv`})], ephemeral: true });
+                                await i.reply({ files: [new AttachmentBuilder(showSelectedTournamentClass.toCsv(), {name: `${showSelectedTournamentClass.name}.csv`})], flags: MessageFlags.Ephemeral });
                                 break;
                             case 'dljson':
-                                await i.reply({ files: [new AttachmentBuilder(showSelectedTournamentClass.toJSON(), {name: `${showSelectedTournamentClass.name}.json`})], ephemeral: true });
+                                await i.reply({ files: [new AttachmentBuilder(showSelectedTournamentClass.toJSON(), {name: `${showSelectedTournamentClass.name}.json`})], flags: MessageFlags.Ephemeral });
                                 break;
                         }
                     });
