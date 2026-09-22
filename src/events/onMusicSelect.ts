@@ -1,4 +1,4 @@
-import { AttachmentBuilder, EmbedBuilder, Events, Interaction, PartialGroupDMChannel, TextBasedChannel } from "discord.js";
+import { AttachmentBuilder, EmbedBuilder, Events, Interaction } from "discord.js";
 import { downloadMusic } from "../functions/music-fetch";
 
 export = {

@@ -1,8 +1,6 @@
-import { ActionRowBuilder, AttachmentBuilder, CacheType, ChatInputCommandInteraction, Collection, ComponentType, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuComponent, StringSelectMenuInteraction, StringSelectMenuOptionBuilder, User } from 'discord.js';
+import { ActionRowBuilder, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
 import { getMusicbyTitle } from '../middlewares/music-operations';
 import { RedisClientType } from 'redis';
-import { downloadMusic } from '../functions/music-fetch';
-import { setEngine } from 'crypto';
 
 export = {
     data: new SlashCommandBuilder()

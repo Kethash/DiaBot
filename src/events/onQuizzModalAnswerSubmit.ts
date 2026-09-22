@@ -1,4 +1,4 @@
-import { ActionRow, ActionRowBuilder, ActionRowComponent, ButtonBuilder, ButtonComponent, EmbedBuilder, Events, Message, MessageActionRowComponent, MessageComponent, ModalSubmitInteraction, StageChannel, TextBasedChannel, TopLevelComponent, userMention } from "discord.js";
+import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonComponent, EmbedBuilder, Events, Message, MessageComponent, ModalSubmitInteraction, StageChannel, TextBasedChannel, userMention } from "discord.js";
 import { compareAnswers } from "../functions/answer-parsing";
 import { RedisClientType } from "redis";
 import { Player, replyQuizzAnswerModal, sendQuizzMessage } from "../functions/quizz";

@@ -1,6 +1,6 @@
 import { createConfig, getGuildConfig } from "../controllers/server-configs";
 import { SlashCommandBuilder } from "discord.js";
-import { serverconfig, ServerConfigSchema } from "../models/diatabase";
+import { ServerConfigSchema } from "../models/diatabase";
 import { setloveleavetime } from "../middlewares/server-config-operations";
 
 export = {

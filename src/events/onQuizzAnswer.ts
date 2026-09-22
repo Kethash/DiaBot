@@ -1,4 +1,4 @@
-import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonComponent, EmbedBuilder, Events, Message, MessageActionRowComponent, MessageComponent, MessageType, StageChannel, TextBasedChannel, TextChannel, TopLevelComponent, userMention } from "discord.js";
+import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonComponent, EmbedBuilder, Events, Message, MessageComponent, MessageType, StageChannel, TextBasedChannel, userMention } from "discord.js";
 import { compareAnswers } from "../functions/answer-parsing";
 import {sendQuizzMessage, replyQuizzAnswer, Player} from "../functions/quizz";
 import config from "../../config.json"

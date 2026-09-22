@@ -1,5 +1,3 @@
-import { TournamentObject } from "../types/redisJsonTypes";
-
 export class Tournament {
     name: string;
     host: string;

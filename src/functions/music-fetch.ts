@@ -1,5 +1,4 @@
 import axios, { AxiosResponse } from "axios";
-import { StringSelectMenuInteraction, CacheType } from "discord.js";
 
 export async function downloadMusic(searchedTitle: string): Promise<{data: {buffer: Buffer | null,title: string, link: string, audio_url?: string | null}, succeed: boolean}> {
     let audioBuffer: Buffer | null = null;

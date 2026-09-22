@@ -2,7 +2,6 @@ import axios from "axios";
 import { ActionRowBuilder, Attachment, CacheType, ChatInputCommandInteraction, ComponentType, Embed, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
 import { addParticipants, createTournament, deleteTournament, finishTournament, getTournamentByUrl, showTournamentInfo } from "../functions/challonge-api";
 import challonge_config from "../../challonge-config.json";
-import { createTournamentParticipantsCollector } from "../functions/tournament";
 
 export = {
     data: new SlashCommandBuilder()

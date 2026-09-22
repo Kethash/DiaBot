@@ -1,5 +1,4 @@
 import { ActionRowBuilder, Events, Interaction, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
-import { RedisClientType } from "redis";
 
 /*
 * 

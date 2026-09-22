@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, Embed, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import config from '../../config.json';
 

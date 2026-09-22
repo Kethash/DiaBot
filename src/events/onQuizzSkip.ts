@@ -1,5 +1,5 @@
-import { Events, TextChannel, Interaction , User, ActionRowBuilder, ButtonBuilder, ButtonStyle, ActionRow, MessageActionRowComponent, ButtonComponent, MessageComponent, TopLevelComponent, APIContainerComponent, APIButtonComponent, APIActionRowComponent, ActionRowComponent } from "discord.js";
-import { sendQuizzMessage, replyQuizzAnswer } from "../functions/quizz";
+import { Events, TextChannel, Interaction , User, ActionRowBuilder, ButtonBuilder, ActionRow, ButtonComponent, MessageComponent } from "discord.js";
+import { sendQuizzMessage } from "../functions/quizz";
 
 export = {
     name: Events.InteractionCreate,

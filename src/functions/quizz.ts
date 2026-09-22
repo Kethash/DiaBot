@@ -1,5 +1,5 @@
 import axios from "axios";
-import {ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, DMChannel, EmbedBuilder, Interaction, Message, MessageCreateOptions, ModalMessageModalSubmitInteraction, ModalSubmitInteraction, NewsChannel, PartialDMChannel, PartialGroupDMChannel, PartialMessage, PrivateThreadChannel, PublicThreadChannel, StageChannel, TextBasedChannel, TextChannel, VoiceChannel } from "discord.js";
+import {ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, DMChannel, EmbedBuilder, Message, MessageCreateOptions, ModalSubmitInteraction, NewsChannel, PartialDMChannel, PartialGroupDMChannel, PartialMessage, PrivateThreadChannel, PublicThreadChannel, StageChannel, TextBasedChannel, TextChannel, VoiceChannel } from "discord.js";
 import sharp from "sharp";
 
 let noEmotes = [
